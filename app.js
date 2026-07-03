@@ -186,12 +186,12 @@ function updateCalculator() {
 function updatePlan() {
   const level = athleteLevel.value;
   const phase = seasonPhase.value;
-  const sessions = Math.max(3, Math.min(8, Number(sessionsPerWeek.value) || 5));
+  const sessions = Math.max(3, Math.min(7, Number(sessionsPerWeek.value) || 5));
   sessionsPerWeek.value = sessions;
 
   const basePlan = planTemplates[phase][level];
   const activeDays = new Set();
-  const dayOrder = sessions >= 7 ? [0, 1, 2, 3, 4, 5, 6] : [0, 1, 2, 3, 4, 5].slice(0, sessions);
+  const dayOrder = [0, 1, 2, 3, 4, 5, 6].slice(0, sessions);
   dayOrder.forEach((day) => activeDays.add(day));
 
   weekPlan.innerHTML = dayNames.map((day, index) => {

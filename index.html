@@ -3,9 +3,14 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>800m.ro - Resursa pentru proba de 800 m</title>
-    <meta name="description" content="Ghid practic pentru proba de 800 m: ritm, splituri, antrenamente, strategie de cursa si resurse pentru atleti si antrenori.">
+    <title>800m.ro - Ghid romanesc pentru proba de 800 m</title>
+    <meta name="description" content="800m.ro este o resursa practica pentru proba de 800 m: calculator de splituri, strategie de cursa, antrenamente, bareme si repere pentru atleti si antrenori.">
     <link rel="canonical" href="https://800m.ro/">
+    <meta property="og:title" content="800m.ro - Ghid pentru proba de 800 m">
+    <meta property="og:description" content="Ritm, tactica, antrenament si resurse pentru doua tururi alergate inteligent.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://800m.ro/">
+    <meta name="theme-color" content="#163832">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -16,8 +21,9 @@
       </a>
       <nav class="nav" aria-label="Navigare principala">
         <a href="#calculator">Calculator</a>
-        <a href="#cursa">Cursa</a>
+        <a href="#strategie">Strategie</a>
         <a href="#antrenamente">Antrenamente</a>
+        <a href="#bareme">Bareme</a>
         <a href="#resurse">Resurse</a>
       </nav>
     </header>
@@ -26,48 +32,69 @@
       <section class="hero">
         <div class="hero-copy">
           <p class="eyebrow">Atletism | 800 m</p>
-          <h1>Ritm, tactica si antrenament pentru doua tururi alergate inteligent.</h1>
-          <p class="lead">Un punct de lucru pentru atleti, antrenori si parinti: splituri, modele de cursa, sesiuni de antrenament si repere care pot fi actualizate constant.</p>
+          <h1>Doua tururi. Un plan clar.</h1>
+          <p class="lead">800m.ro aduna intr-un singur loc ritmuri, splituri, modele de cursa si antrenamente pentru sportivii si antrenorii care vor sa lucreze mai precis.</p>
           <div class="hero-actions">
             <a class="button primary" href="#calculator">Calculeaza splituri</a>
-            <a class="button secondary" href="#antrenamente">Vezi sesiuni</a>
+            <a class="button secondary" href="#antrenamente">Construieste o sesiune</a>
           </div>
         </div>
-        <div class="track-visual" aria-label="Diagrama tactica 800 m">
-          <div class="track">
-            <div class="lane lane-1"></div>
-            <div class="lane lane-2"></div>
-            <div class="lane lane-3"></div>
-            <div class="split split-start">Start</div>
-            <div class="split split-200">200</div>
-            <div class="split split-400">400</div>
-            <div class="split split-600">600</div>
-            <div class="runner runner-a"></div>
-            <div class="runner runner-b"></div>
+
+        <div class="hero-panel" aria-label="Rezumat vizual pentru cursa de 800 m">
+          <div class="track-scene">
+            <div class="track">
+              <div class="lane lane-1"></div>
+              <div class="lane lane-2"></div>
+              <div class="lane lane-3"></div>
+              <span class="split split-start">Start</span>
+              <span class="split split-200">200</span>
+              <span class="split split-400">400</span>
+              <span class="split split-600">600</span>
+              <span class="runner runner-a"></span>
+              <span class="runner runner-b"></span>
+            </div>
+          </div>
+          <div class="hero-stat-grid">
+            <article>
+              <strong>0-200</strong>
+              <span>pozitie</span>
+            </article>
+            <article>
+              <strong>200-500</strong>
+              <span>economie</span>
+            </article>
+            <article>
+              <strong>500-700</strong>
+              <span>decizie</span>
+            </article>
+            <article>
+              <strong>700-800</strong>
+              <span>finish</span>
+            </article>
           </div>
         </div>
       </section>
 
       <section class="metrics" aria-label="Repere rapide">
         <article>
-          <span>2</span>
-          <p>tururi de pista, cu primul viraj alergat pe culoar.</p>
+          <span>800 m</span>
+          <p>proba de viteza prelungita in care ritmul mediu si pozitia in pluton conteaza la fel de mult.</p>
         </article>
         <article>
-          <span>~51%</span>
-          <p>din timp este adesea consumat in primul 400 m la curse rapide.</p>
+          <span>4 x 200</span>
+          <p>cea mai simpla impartire pentru analiza cursei, feedback si pregatirea planului de start.</p>
         </article>
         <article>
-          <span>3 zone</span>
-          <p>viteza, toleranta lactica si rezistenta aerobica specifica.</p>
+          <span>3 sisteme</span>
+          <p>viteza, capacitate anaeroba si suport aerobic trebuie dezvoltate impreuna.</p>
         </article>
       </section>
 
       <section id="calculator" class="section calculator-section">
         <div class="section-heading">
           <p class="eyebrow">Instrument</p>
-          <h2>Calculator de ritm pentru 800 m</h2>
-          <p>Introdu timpul tinta si vezi splituri orientative pentru cursa, ritm pe 200 m si proiectie pentru antrenamente.</p>
+          <h2>Calculator de ritm si antrenament</h2>
+          <p>Introdu timpul tinta pentru 800 m. Calculatorul construieste splituri, proiectii pentru 400/600/1000 m si exemple de repetari utile.</p>
         </div>
 
         <div class="tool-grid">
@@ -84,6 +111,15 @@
                 <option value="balanced">Echilibrat</option>
                 <option value="positive">Primul tur mai rapid</option>
                 <option value="negative">Finish progresiv</option>
+              </select>
+            </label>
+
+            <label>
+              Obiectiv principal
+              <select id="trainingFocus">
+                <option value="specific">Ritm specific 800 m</option>
+                <option value="speed">Viteza si relaxare</option>
+                <option value="endurance">Rezistenta specifica</option>
               </select>
             </label>
 
@@ -107,19 +143,38 @@
             </div>
           </div>
         </div>
+
+        <div class="projection-grid" aria-label="Proiectii si sesiuni">
+          <article>
+            <span>400 m controlat</span>
+            <strong id="projection400">56.6</strong>
+          </article>
+          <article>
+            <span>600 m test</span>
+            <strong id="projection600">1:25.5</strong>
+          </article>
+          <article>
+            <span>1000 m specific</span>
+            <strong id="projection1000">2:32.1</strong>
+          </article>
+          <article>
+            <span>Sesiune sugerata</span>
+            <strong id="workoutSuggestion">5 x 200 m in 29.5</strong>
+          </article>
+        </div>
       </section>
 
-      <section id="cursa" class="section race-model">
+      <section id="strategie" class="section race-model">
         <div class="section-heading">
           <p class="eyebrow">Strategie</p>
-          <h2>Model simplu de cursa</h2>
-          <p>800 m cere decizii rapide: pozitie, relaxare sub viteza mare si momentul potrivit pentru angajare.</p>
+          <h2>Model de cursa pe segmente</h2>
+          <p>Un plan bun nu inseamna doar splituri. Inseamna pozitie, respiratie, economie de miscare si decizie la momentul potrivit.</p>
         </div>
         <div class="timeline">
           <article>
             <span>0-200</span>
             <h3>Iesire controlata</h3>
-            <p>Accelereaza ferm, ocupa pozitia fara sprint inutil si stabilizeaza respiratia inainte de linia de taiere.</p>
+            <p>Accelereaza ferm, ocupa pozitia fara sprint inutil si stabileste respiratia inainte de linia de taiere.</p>
           </article>
           <article>
             <span>200-400</span>
@@ -142,34 +197,58 @@
       <section id="antrenamente" class="section workouts">
         <div class="section-heading">
           <p class="eyebrow">Biblioteca</p>
-          <h2>Sesiuni utile pentru 800 m</h2>
-          <p>Exemplele sunt orientative. Volumul, pauzele si intensitatea trebuie adaptate varstei, nivelului si perioadei de pregatire.</p>
+          <h2>Antrenamente utile pentru 800 m</h2>
+          <p>Exemplele sunt orientative. Volumul, pauzele si intensitatea trebuie adaptate varstei, nivelului, istoricului medical si perioadei de pregatire.</p>
         </div>
         <div class="workout-grid">
           <article class="workout">
             <h3>Viteza specifica</h3>
             <p>5 x 200 m la ritm de cursa, pauza 3-4 min. Accent pe relaxare si repetabilitate.</p>
+            <span>Calitate, volum mic</span>
           </article>
           <article class="workout">
             <h3>Toleranta lactica</h3>
-            <p>300 m + 300 m + 200 m, pauza 6-8 min. Calitate ridicata, volum mic.</p>
+            <p>300 m + 300 m + 200 m, pauza 6-8 min. Pastreaza tehnica in ultimii 120 m.</p>
+            <span>Sesiune solicitanta</span>
           </article>
           <article class="workout">
             <h3>Rezistenta specifica</h3>
             <p>3 x 500 m la ritm controlat, pauza 6 min. Ultimii 100 m alergati tehnic, nu fortat.</p>
+            <span>Control si postura</span>
           </article>
           <article class="workout">
             <h3>Aerob de sprijin</h3>
             <p>25-45 min alergare usoara plus 6 linii. Sustine recuperarea si consistenta saptamanala.</p>
+            <span>Fundatie</span>
           </article>
+        </div>
+      </section>
+
+      <section id="bareme" class="section standards">
+        <div class="section-heading">
+          <p class="eyebrow">Repere</p>
+          <h2>Trepte de performanta</h2>
+          <p>Un tabel simplu pentru orientare. Nu inlocuieste baremele oficiale ale competitiilor, dar ajuta la setarea obiectivelor de sezon.</p>
+        </div>
+        <div class="standards-table" role="table" aria-label="Trepte orientative de performanta 800 m">
+          <div role="row">
+            <span role="columnheader">Nivel</span>
+            <span role="columnheader">Masculin</span>
+            <span role="columnheader">Feminin</span>
+            <span role="columnheader">Focus</span>
+          </div>
+          <div role="row"><strong>Incepator</strong><span>2:35+</span><span>3:05+</span><span>tehnica, continuitate</span></div>
+          <div role="row"><strong>Club</strong><span>2:10-2:35</span><span>2:35-3:05</span><span>ritm, forta generala</span></div>
+          <div role="row"><strong>Competitiv</strong><span>1:58-2:10</span><span>2:18-2:35</span><span>viteza specifica</span></div>
+          <div role="row"><strong>Avansat</strong><span>sub 1:58</span><span>sub 2:18</span><span>tactica si detaliu</span></div>
         </div>
       </section>
 
       <section id="resurse" class="section resources">
         <div class="section-heading">
-          <p class="eyebrow">Actualizari</p>
-          <h2>Ce poate creste aici</h2>
-          <p>Site-ul este pregatit pentru actualizari regulate: articole, tabele de barem, interviuri, exemple de microcicluri si analize de curse.</p>
+          <p class="eyebrow">Resurse</p>
+          <h2>Ce va creste pe 800m.ro</h2>
+          <p>Site-ul este pregatit pentru actualizari regulate: articole, tabele, interviuri, exemple de microcicluri si analize de curse.</p>
         </div>
         <div class="resource-list">
           <article>

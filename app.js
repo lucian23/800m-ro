@@ -2,6 +2,7 @@ const form = document.querySelector("#paceForm");
 const targetTime = document.querySelector("#targetTime");
 const raceProfile = document.querySelector("#raceProfile");
 const trainingFocus = document.querySelector("#trainingFocus");
+const standardGender = document.querySelector("#standardGender");
 const plannerForm = document.querySelector("#plannerForm");
 const athleteLevel = document.querySelector("#athleteLevel");
 const seasonPhase = document.querySelector("#seasonPhase");
@@ -28,6 +29,8 @@ const fields = {
   projection600: document.querySelector("#projection600"),
   projection1000: document.querySelector("#projection1000"),
   workoutSuggestion: document.querySelector("#workoutSuggestion"),
+  performanceLevel: document.querySelector("#performanceLevel"),
+  nextBenchmark: document.querySelector("#nextBenchmark"),
   zoneSpeed: document.querySelector("#zoneSpeed"),
   zoneSpecific: document.querySelector("#zoneSpecific"),
   zoneEndurance: document.querySelector("#zoneEndurance"),
@@ -194,6 +197,7 @@ function buildSettingsUrl() {
   url.searchParams.set("t", targetTime.value.trim());
   url.searchParams.set("profil", raceProfile.value);
   url.searchParams.set("focus", trainingFocus.value);
+  url.searchParams.set("gen", standardGender.value);
   url.searchParams.set("nivel", athleteLevel.value);
   url.searchParams.set("perioada", seasonPhase.value);
   url.searchParams.set("sedinte", sessionsPerWeek.value);
@@ -212,6 +216,7 @@ function restoreFromUrl() {
     targetTime: params.get("t"),
     raceProfile: params.get("profil"),
     trainingFocus: params.get("focus"),
+    standardGender: params.get("gen"),
     athleteLevel: params.get("nivel"),
     seasonPhase: params.get("perioada"),
     sessionsPerWeek: params.get("sedinte")
@@ -220,6 +225,7 @@ function restoreFromUrl() {
   if (values.targetTime) targetTime.value = values.targetTime;
   if ([...raceProfile.options].some((option) => option.value === values.raceProfile)) raceProfile.value = values.raceProfile;
   if ([...trainingFocus.options].some((option) => option.value === values.trainingFocus)) trainingFocus.value = values.trainingFocus;
+  if ([...standardGender.options].some((option) => option.value === values.standardGender)) standardGender.value = values.standardGender;
   if ([...athleteLevel.options].some((option) => option.value === values.athleteLevel)) athleteLevel.value = values.athleteLevel;
   if ([...seasonPhase.options].some((option) => option.value === values.seasonPhase)) seasonPhase.value = values.seasonPhase;
   if (values.sessionsPerWeek) sessionsPerWeek.value = values.sessionsPerWeek;
@@ -269,6 +275,25 @@ function trainingZones(totalSeconds) {
     tempo: `1000 m: ${formatTime(totalSeconds * 1.55)}`,
     easy: `1 km: ${formatTime(Math.max(210, totalSeconds * 2.15), 0)}`
   };
+}
+
+function performanceBenchmark(totalSeconds, gender) {
+  const standards = {
+    male: [
+      { label: "Avansat", threshold: 118, next: "mentine sub 1:58", note: "detalii individuale, recuperare, curse" },
+      { label: "Competitiv", threshold: 130, next: "sub 1:58", note: "viteza specifica si tactica" },
+      { label: "Club", threshold: 155, next: "sub 2:10", note: "ritm, forta generala, baza aerobica" },
+      { label: "Incepator", threshold: Infinity, next: "sub 2:35", note: "tehnica, continuitate, placerea alergarii" }
+    ],
+    female: [
+      { label: "Avansat", threshold: 138, next: "mentine sub 2:18", note: "detalii individuale, recuperare, curse" },
+      { label: "Competitiv", threshold: 155, next: "sub 2:18", note: "viteza specifica si tactica" },
+      { label: "Club", threshold: 185, next: "sub 2:35", note: "ritm, forta generala, baza aerobica" },
+      { label: "Incepator", threshold: Infinity, next: "sub 3:05", note: "tehnica, continuitate, placerea alergarii" }
+    ]
+  };
+
+  return standards[gender].find((standard) => totalSeconds < standard.threshold);
 }
 
 function strategyAdvice(profile) {
@@ -330,6 +355,7 @@ function paceSummary() {
     `Ritm mediu / 200 m: ${fields.pacePer200.textContent}`,
     `Splituri: 200 m ${fields.split200.textContent}, 400 m ${fields.split400.textContent}, 600 m ${fields.split600.textContent}, 800 m ${fields.split800.textContent}`,
     `Proiectii: 400 m ${fields.projection400.textContent}, 600 m ${fields.projection600.textContent}, 1000 m ${fields.projection1000.textContent}`,
+    `Reper performanta (${standardGender.selectedOptions[0].textContent}): ${fields.performanceLevel.textContent}; reper cheie ${fields.nextBenchmark.textContent}`,
     `Zone: ${fields.zoneSpeed.textContent}; ${fields.zoneSpecific.textContent}; ${fields.zoneEndurance.textContent}; ${fields.zoneTempo.textContent}; ${fields.zoneEasy.textContent}`,
     `Sesiune sugerata: ${fields.workoutSuggestion.textContent}`,
     "Strategie personalizata:",
@@ -375,6 +401,10 @@ function updateCalculator() {
   fields.projection600.textContent = formatTime(total * 0.725);
   fields.projection1000.textContent = formatTime(total * 1.29);
   fields.workoutSuggestion.textContent = workoutFor(total, trainingFocus.value);
+
+  const benchmark = performanceBenchmark(total, standardGender.value);
+  fields.performanceLevel.textContent = benchmark.label;
+  fields.nextBenchmark.textContent = `${benchmark.next} — ${benchmark.note}`;
 
   const zones = trainingZones(total);
   fields.zoneSpeed.textContent = zones.speed;
@@ -436,6 +466,7 @@ form.addEventListener("submit", (event) => {
 targetTime.addEventListener("input", enableUrlSync(updateCalculator));
 raceProfile.addEventListener("change", enableUrlSync(updateCalculator));
 trainingFocus.addEventListener("change", enableUrlSync(updateCalculator));
+standardGender.addEventListener("change", enableUrlSync(updateCalculator));
 plannerForm.addEventListener("input", enableUrlSync(updatePlan));
 plannerForm.addEventListener("change", enableUrlSync(updatePlan));
 copyPace.addEventListener("click", () => copyText(paceSummary(), paceStatus, "Rezultatul a fost copiat."));

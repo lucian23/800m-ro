@@ -8,6 +8,7 @@ const seasonPhase = document.querySelector("#seasonPhase");
 const sessionsPerWeek = document.querySelector("#sessionsPerWeek");
 const weekPlan = document.querySelector("#weekPlan");
 const workoutGrid = document.querySelector("#workoutGrid");
+const personalStrategy = document.querySelector("#personalStrategy");
 const filterButtons = document.querySelectorAll(".filter");
 const copyPace = document.querySelector("#copyPace");
 const sharePace = document.querySelector("#sharePace");
@@ -270,14 +271,69 @@ function trainingZones(totalSeconds) {
   };
 }
 
+function strategyAdvice(profile) {
+  if (profile === "positive") {
+    return [
+      "Pornire ferma, dar fara sprint lung; cauta culoarul si pozitia inainte de 200 m.",
+      "Controleaza primul tur: nu mai accelera daca ai deja pozitie buna.",
+      "Accepta ca ritmul devine greu; mentine bratele active si evita pasii laterali.",
+      "Finish-ul vine din economie: creste presiunea treptat, nu astepta ultimii 50 m."
+    ];
+  }
+
+  if (profile === "negative") {
+    return [
+      "Pleaca ordonat si relaxat; lasa loc pentru progresie fara sa ramai blocat.",
+      "Pastreaza contactul cu grupul potrivit si pregateste mutarea dupa primul tur.",
+      "Incepe cresterea controlata: postura inalta, cadenta stabila, privire inainte.",
+      "Ultimul 200 m trebuie lansat devreme; foloseste bratele si alege culoarul clar."
+    ];
+  }
+
+  return [
+    "Plecare controlata: viteza utila, fara consum inutil in primele secunde.",
+    "Primul tur trebuie sa para sustenabil; evita franarile si schimbarile dese.",
+    "Zona 400-600 m cere disciplina: mentine ritmul chiar cand senzatia se schimba.",
+    "Finish progresiv: ridica frecventa si pastreaza postura pana la linie."
+  ];
+}
+
+function renderStrategy(cumulative, profile) {
+  const labels = ["0-200 m", "200-400 m", "400-600 m", "600-800 m"];
+  const splitLabels = [
+    `pana la ${formatTime(cumulative[0])}`,
+    `${formatTime(cumulative[0])} - ${formatTime(cumulative[1])}`,
+    `${formatTime(cumulative[1])} - ${formatTime(cumulative[2])}`,
+    `${formatTime(cumulative[2])} - ${formatTime(cumulative[3])}`
+  ];
+  const advice = strategyAdvice(profile);
+
+  personalStrategy.innerHTML = labels.map((label, index) => `
+    <article>
+      <span>${label}</span>
+      <strong>${splitLabels[index]}</strong>
+      <p>${advice[index]}</p>
+    </article>
+  `).join("");
+}
+
 function paceSummary() {
+  const strategy = [...personalStrategy.querySelectorAll("article")].map((item) => {
+    const segment = item.querySelector("span").textContent;
+    const time = item.querySelector("strong").textContent;
+    const advice = item.querySelector("p").textContent;
+    return `${segment}: ${time} — ${advice}`;
+  });
+
   return [
     `800 m tinta: ${fields.split800.textContent}`,
     `Ritm mediu / 200 m: ${fields.pacePer200.textContent}`,
     `Splituri: 200 m ${fields.split200.textContent}, 400 m ${fields.split400.textContent}, 600 m ${fields.split600.textContent}, 800 m ${fields.split800.textContent}`,
     `Proiectii: 400 m ${fields.projection400.textContent}, 600 m ${fields.projection600.textContent}, 1000 m ${fields.projection1000.textContent}`,
     `Zone: ${fields.zoneSpeed.textContent}; ${fields.zoneSpecific.textContent}; ${fields.zoneEndurance.textContent}; ${fields.zoneTempo.textContent}; ${fields.zoneEasy.textContent}`,
-    `Sesiune sugerata: ${fields.workoutSuggestion.textContent}`
+    `Sesiune sugerata: ${fields.workoutSuggestion.textContent}`,
+    "Strategie personalizata:",
+    ...strategy
   ].join("\n");
 }
 
@@ -326,6 +382,8 @@ function updateCalculator() {
   fields.zoneEndurance.textContent = zones.endurance;
   fields.zoneTempo.textContent = zones.tempo;
   fields.zoneEasy.textContent = zones.easy;
+
+  renderStrategy(cumulative, raceProfile.value);
 
   syncUrlState();
 }

@@ -261,6 +261,7 @@ h3 {
 .quick-tools,
 .projection-grid,
 .zone-grid,
+.race-strategy-grid,
 .timeline,
 .workout-grid,
 .cards-three,
@@ -281,6 +282,7 @@ h3 {
 .week-plan,
 .projection-grid article,
 .zone-grid article,
+.race-strategy-grid article,
 .timeline article,
 .workout,
 .cards-three article,
@@ -304,6 +306,7 @@ h3 {
 .hero-stat-grid span,
 .projection-grid span,
 .zone-grid span,
+.race-strategy-grid span,
 .workout-meta,
 .quick-tools span {
   color: var(--muted);
@@ -495,6 +498,10 @@ input[aria-invalid="true"] {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
+.race-strategy-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .projection-grid article {
   display: grid;
   gap: 8px;
@@ -510,12 +517,23 @@ input[aria-invalid="true"] {
   padding: 18px;
 }
 
+.race-strategy-grid article {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 210px;
+  padding: 20px;
+  background: linear-gradient(180deg, #fff 0%, #fbfaf6 100%);
+}
+
 .projection-grid strong,
-.zone-grid strong {
+.zone-grid strong,
+.race-strategy-grid strong {
   font-size: 22px;
 }
 
-.zone-grid p {
+.zone-grid p,
+.race-strategy-grid p {
   margin-bottom: 0;
   color: var(--muted);
 }
@@ -673,6 +691,7 @@ input[aria-invalid="true"] {
   .timeline,
   .projection-grid,
   .zone-grid,
+  .race-strategy-grid,
   .workout-grid,
   .cards-three,
   .knowledge-grid {
@@ -704,6 +723,7 @@ input[aria-invalid="true"] {
   .timeline,
   .projection-grid,
   .zone-grid,
+  .race-strategy-grid,
   .workout-grid,
   .cards-three,
   .knowledge-grid,

@@ -133,15 +133,36 @@ function formatTime(seconds, decimals = 1) {
   return `${minutes}:${rest.toFixed(decimals).padStart(width, "0")}`;
 }
 
-function setStatus(element, message) {
+function manualCopyBoxFor(statusElement) {
+  const id = `${statusElement.id}ManualCopy`;
+  let box = document.querySelector(`#${id}`);
+  if (!box) {
+    box = document.createElement("textarea");
+    box.id = id;
+    box.className = "manual-copy";
+    box.setAttribute("readonly", "");
+    box.setAttribute("aria-label", "Text pentru copiere manuala");
+    statusElement.insertAdjacentElement("afterend", box);
+  }
+  return box;
+}
+
+function setStatus(element, message, options = {}) {
   element.textContent = message;
   window.clearTimeout(element.dataset.timerId);
-  element.dataset.timerId = window.setTimeout(() => {
-    element.textContent = "";
-  }, 2600);
+
+  if (!options.persistent) {
+    element.dataset.timerId = window.setTimeout(() => {
+      element.textContent = "";
+    }, 2600);
+  }
 }
 
 async function copyText(text, statusElement, successMessage) {
+  const manualBox = manualCopyBoxFor(statusElement);
+  manualBox.hidden = true;
+  manualBox.value = "";
+
   try {
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text);
@@ -153,12 +174,17 @@ async function copyText(text, statusElement, successMessage) {
       area.style.left = "-9999px";
       document.body.append(area);
       area.select();
-      document.execCommand("copy");
+      const copied = document.execCommand("copy");
       area.remove();
+      if (!copied) throw new Error("execCommand copy failed");
     }
     setStatus(statusElement, successMessage);
   } catch (error) {
-    setStatus(statusElement, "Nu am putut copia automat. Selecteaza manual textul.");
+    manualBox.hidden = false;
+    manualBox.value = text;
+    manualBox.focus();
+    manualBox.select();
+    setStatus(statusElement, "Nu am putut copia automat. Textul este afisat mai jos pentru copiere manuala.", { persistent: true });
   }
 }
 

@@ -122,6 +122,11 @@
             </label>
 
             <button class="button primary" type="submit">Actualizeaza</button>
+            <div class="tool-actions" aria-label="Actiuni calculator">
+              <button class="button secondary small" id="copyPace" type="button">Copiaza rezultatul</button>
+              <button class="button secondary small" id="sharePace" type="button">Link cu setarile</button>
+            </div>
+            <p class="status-message" id="paceStatus" role="status" aria-live="polite"></p>
           </form>
 
           <div class="results" aria-live="polite">
@@ -176,6 +181,8 @@
               Sedinte pe saptamana
               <input id="sessionsPerWeek" type="number" min="3" max="7" value="5">
             </label>
+            <button class="button secondary" id="copyPlan" type="button">Copiaza saptamana</button>
+            <p class="status-message" id="planStatus" role="status" aria-live="polite"></p>
           </form>
           <div class="week-plan" id="weekPlan" aria-live="polite"></div>
         </div>

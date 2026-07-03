@@ -9,6 +9,12 @@ const sessionsPerWeek = document.querySelector("#sessionsPerWeek");
 const weekPlan = document.querySelector("#weekPlan");
 const workoutGrid = document.querySelector("#workoutGrid");
 const filterButtons = document.querySelectorAll(".filter");
+const copyPace = document.querySelector("#copyPace");
+const sharePace = document.querySelector("#sharePace");
+const copyPlan = document.querySelector("#copyPlan");
+const paceStatus = document.querySelector("#paceStatus");
+const planStatus = document.querySelector("#planStatus");
+let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
   heroTarget: document.querySelector("#heroTarget"),
@@ -121,6 +127,71 @@ function formatTime(seconds, decimals = 1) {
   return `${minutes}:${rest.toFixed(decimals).padStart(3 + decimals, "0")}`;
 }
 
+function setStatus(element, message) {
+  element.textContent = message;
+  window.clearTimeout(element.dataset.timerId);
+  element.dataset.timerId = window.setTimeout(() => {
+    element.textContent = "";
+  }, 2600);
+}
+
+async function copyText(text, statusElement, successMessage) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.setAttribute("readonly", "");
+      area.style.position = "fixed";
+      area.style.left = "-9999px";
+      document.body.append(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+    }
+    setStatus(statusElement, successMessage);
+  } catch (error) {
+    setStatus(statusElement, "Nu am putut copia automat. Selecteaza manual textul.");
+  }
+}
+
+function buildSettingsUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("t", targetTime.value.trim());
+  url.searchParams.set("profil", raceProfile.value);
+  url.searchParams.set("focus", trainingFocus.value);
+  url.searchParams.set("nivel", athleteLevel.value);
+  url.searchParams.set("perioada", seasonPhase.value);
+  url.searchParams.set("sedinte", sessionsPerWeek.value);
+  url.hash = "calculator";
+  return url;
+}
+
+function syncUrlState() {
+  if (!stateSyncEnabled || !window.history?.replaceState) return;
+  window.history.replaceState({}, "", buildSettingsUrl());
+}
+
+function restoreFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const values = {
+    targetTime: params.get("t"),
+    raceProfile: params.get("profil"),
+    trainingFocus: params.get("focus"),
+    athleteLevel: params.get("nivel"),
+    seasonPhase: params.get("perioada"),
+    sessionsPerWeek: params.get("sedinte")
+  };
+
+  if (values.targetTime) targetTime.value = values.targetTime;
+  if ([...raceProfile.options].some((option) => option.value === values.raceProfile)) raceProfile.value = values.raceProfile;
+  if ([...trainingFocus.options].some((option) => option.value === values.trainingFocus)) trainingFocus.value = values.trainingFocus;
+  if ([...athleteLevel.options].some((option) => option.value === values.athleteLevel)) athleteLevel.value = values.athleteLevel;
+  if ([...seasonPhase.options].some((option) => option.value === values.seasonPhase)) seasonPhase.value = values.seasonPhase;
+  if (values.sessionsPerWeek) sessionsPerWeek.value = values.sessionsPerWeek;
+}
+
 function splitPlan(totalSeconds, profile) {
   const average = totalSeconds / 4;
 
@@ -156,6 +227,29 @@ function workoutFor(totalSeconds, focus) {
   return `5 x 200 m in ${formatTime(pace200)} sau 3 x 300 m in ${formatTime(pace300)}`;
 }
 
+function paceSummary() {
+  return [
+    `800 m tinta: ${fields.split800.textContent}`,
+    `Ritm mediu / 200 m: ${fields.pacePer200.textContent}`,
+    `Splituri: 200 m ${fields.split200.textContent}, 400 m ${fields.split400.textContent}, 600 m ${fields.split600.textContent}, 800 m ${fields.split800.textContent}`,
+    `Proiectii: 400 m ${fields.projection400.textContent}, 600 m ${fields.projection600.textContent}, 1000 m ${fields.projection1000.textContent}`,
+    `Sesiune sugerata: ${fields.workoutSuggestion.textContent}`
+  ].join("\n");
+}
+
+function planSummary() {
+  const rows = [...weekPlan.querySelectorAll(".day-row")].map((row) => {
+    const day = row.querySelector("strong").textContent;
+    const text = row.querySelector("p").textContent;
+    return `${day}: ${text}`;
+  });
+
+  return [
+    `Plan 800 m: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte/saptamana`,
+    ...rows
+  ].join("\n");
+}
+
 function updateCalculator() {
   const total = parseTime(targetTime.value);
   if (!total || total < 60 || total > 360) {
@@ -181,6 +275,7 @@ function updateCalculator() {
   fields.projection600.textContent = formatTime(total * 0.725);
   fields.projection1000.textContent = formatTime(total * 1.29);
   fields.workoutSuggestion.textContent = workoutFor(total, trainingFocus.value);
+  syncUrlState();
 }
 
 function updatePlan() {
@@ -198,6 +293,7 @@ function updatePlan() {
     const text = activeDays.has(index) ? basePlan[index] : "Liber / recuperare";
     return `<div class="day-row"><strong>${day}</strong><p>${text}</p></div>`;
   }).join("");
+  syncUrlState();
 }
 
 function renderWorkouts(filter = "all") {
@@ -214,16 +310,27 @@ function renderWorkouts(filter = "all") {
   `).join("");
 }
 
+function enableUrlSync(callback) {
+  return (event) => {
+    stateSyncEnabled = true;
+    callback(event);
+  };
+}
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
+  stateSyncEnabled = true;
   updateCalculator();
 });
 
-targetTime.addEventListener("input", updateCalculator);
-raceProfile.addEventListener("change", updateCalculator);
-trainingFocus.addEventListener("change", updateCalculator);
-plannerForm.addEventListener("input", updatePlan);
-plannerForm.addEventListener("change", updatePlan);
+targetTime.addEventListener("input", enableUrlSync(updateCalculator));
+raceProfile.addEventListener("change", enableUrlSync(updateCalculator));
+trainingFocus.addEventListener("change", enableUrlSync(updateCalculator));
+plannerForm.addEventListener("input", enableUrlSync(updatePlan));
+plannerForm.addEventListener("change", enableUrlSync(updatePlan));
+copyPace.addEventListener("click", () => copyText(paceSummary(), paceStatus, "Rezultatul a fost copiat."));
+sharePace.addEventListener("click", () => copyText(buildSettingsUrl().toString(), paceStatus, "Linkul cu setarile a fost copiat."));
+copyPlan.addEventListener("click", () => copyText(planSummary(), planStatus, "Planul saptamanal a fost copiat."));
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -233,6 +340,7 @@ filterButtons.forEach((button) => {
   });
 });
 
+restoreFromUrl();
 updateCalculator();
 updatePlan();
 renderWorkouts();

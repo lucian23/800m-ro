@@ -179,6 +179,12 @@ h3 {
   cursor: pointer;
 }
 
+.button.small {
+  min-height: 40px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+
 .button.primary {
   color: #fff;
   background: var(--accent);
@@ -385,6 +391,20 @@ input[aria-invalid="true"] {
   margin: -10px 0 0;
   color: var(--muted);
   font-size: 13px;
+}
+
+.tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.status-message {
+  min-height: 20px;
+  margin: -8px 0 0;
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .results {

@@ -260,6 +260,7 @@ h3 {
 .hero-stat-grid,
 .quick-tools,
 .projection-grid,
+.zone-grid,
 .timeline,
 .workout-grid,
 .cards-three,
@@ -279,6 +280,7 @@ h3 {
 .results,
 .week-plan,
 .projection-grid article,
+.zone-grid article,
 .timeline article,
 .workout,
 .cards-three article,
@@ -301,6 +303,7 @@ h3 {
 
 .hero-stat-grid span,
 .projection-grid span,
+.zone-grid span,
 .workout-meta,
 .quick-tools span {
   color: var(--muted);
@@ -347,6 +350,16 @@ h3 {
 .section-heading p:not(.eyebrow) {
   color: var(--muted);
   font-size: 18px;
+}
+
+.section-subheading {
+  max-width: 780px;
+  margin: 28px 0 18px;
+}
+
+.section-subheading p {
+  margin-bottom: 0;
+  color: var(--muted);
 }
 
 .tool-grid,
@@ -463,6 +476,10 @@ input[aria-invalid="true"] {
   margin-top: 20px;
 }
 
+.zone-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
 .projection-grid article {
   display: grid;
   gap: 8px;
@@ -470,8 +487,22 @@ input[aria-invalid="true"] {
   padding: 18px;
 }
 
-.projection-grid strong {
+.zone-grid article {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 180px;
+  padding: 18px;
+}
+
+.projection-grid strong,
+.zone-grid strong {
   font-size: 22px;
+}
+
+.zone-grid p {
+  margin-bottom: 0;
+  color: var(--muted);
 }
 
 .planner-section,
@@ -626,6 +657,7 @@ input[aria-invalid="true"] {
   .quick-tools,
   .timeline,
   .projection-grid,
+  .zone-grid,
   .workout-grid,
   .cards-three,
   .knowledge-grid {
@@ -656,6 +688,7 @@ input[aria-invalid="true"] {
   .quick-tools,
   .timeline,
   .projection-grid,
+  .zone-grid,
   .workout-grid,
   .cards-three,
   .knowledge-grid,

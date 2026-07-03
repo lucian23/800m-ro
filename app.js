@@ -26,7 +26,12 @@ const fields = {
   projection400: document.querySelector("#projection400"),
   projection600: document.querySelector("#projection600"),
   projection1000: document.querySelector("#projection1000"),
-  workoutSuggestion: document.querySelector("#workoutSuggestion")
+  workoutSuggestion: document.querySelector("#workoutSuggestion"),
+  zoneSpeed: document.querySelector("#zoneSpeed"),
+  zoneSpecific: document.querySelector("#zoneSpecific"),
+  zoneEndurance: document.querySelector("#zoneEndurance"),
+  zoneTempo: document.querySelector("#zoneTempo"),
+  zoneEasy: document.querySelector("#zoneEasy")
 };
 
 const workouts = [
@@ -124,7 +129,8 @@ function formatTime(seconds, decimals = 1) {
   const minutes = Math.floor(seconds / 60);
   const rest = seconds - minutes * 60;
   if (minutes <= 0) return rest.toFixed(decimals);
-  return `${minutes}:${rest.toFixed(decimals).padStart(3 + decimals, "0")}`;
+  const width = decimals > 0 ? 3 + decimals : 2;
+  return `${minutes}:${rest.toFixed(decimals).padStart(width, "0")}`;
 }
 
 function setStatus(element, message) {
@@ -227,12 +233,24 @@ function workoutFor(totalSeconds, focus) {
   return `5 x 200 m in ${formatTime(pace200)} sau 3 x 300 m in ${formatTime(pace300)}`;
 }
 
+function trainingZones(totalSeconds) {
+  const pace200 = totalSeconds / 4;
+  return {
+    speed: `150 m: ${formatTime(pace200 * 0.74)}-${formatTime(pace200 * 0.78)}`,
+    specific: `200 m: ${formatTime(pace200)} | 300 m: ${formatTime(pace200 * 1.5)}`,
+    endurance: `500 m: ${formatTime(pace200 * 2.5 + 2)}`,
+    tempo: `1000 m: ${formatTime(totalSeconds * 1.55)}`,
+    easy: `1 km: ${formatTime(Math.max(210, totalSeconds * 2.15), 0)}`
+  };
+}
+
 function paceSummary() {
   return [
     `800 m tinta: ${fields.split800.textContent}`,
     `Ritm mediu / 200 m: ${fields.pacePer200.textContent}`,
     `Splituri: 200 m ${fields.split200.textContent}, 400 m ${fields.split400.textContent}, 600 m ${fields.split600.textContent}, 800 m ${fields.split800.textContent}`,
     `Proiectii: 400 m ${fields.projection400.textContent}, 600 m ${fields.projection600.textContent}, 1000 m ${fields.projection1000.textContent}`,
+    `Zone: ${fields.zoneSpeed.textContent}; ${fields.zoneSpecific.textContent}; ${fields.zoneEndurance.textContent}; ${fields.zoneTempo.textContent}; ${fields.zoneEasy.textContent}`,
     `Sesiune sugerata: ${fields.workoutSuggestion.textContent}`
   ].join("\n");
 }
@@ -275,6 +293,14 @@ function updateCalculator() {
   fields.projection600.textContent = formatTime(total * 0.725);
   fields.projection1000.textContent = formatTime(total * 1.29);
   fields.workoutSuggestion.textContent = workoutFor(total, trainingFocus.value);
+
+  const zones = trainingZones(total);
+  fields.zoneSpeed.textContent = zones.speed;
+  fields.zoneSpecific.textContent = zones.specific;
+  fields.zoneEndurance.textContent = zones.endurance;
+  fields.zoneTempo.textContent = zones.tempo;
+  fields.zoneEasy.textContent = zones.easy;
+
   syncUrlState();
 }
 

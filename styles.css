@@ -262,6 +262,8 @@ h3 {
 .projection-grid,
 .zone-grid,
 .race-strategy-grid,
+.test-predictor-grid,
+.test-estimate,
 .timeline,
 .workout-grid,
 .cards-three,
@@ -284,6 +286,7 @@ h3 {
 .projection-grid article,
 .zone-grid article,
 .race-strategy-grid article,
+.test-estimate article,
 .timeline article,
 .workout,
 .cards-three article,
@@ -308,6 +311,7 @@ h3 {
 .projection-grid span,
 .zone-grid span,
 .race-strategy-grid span,
+.test-estimate span,
 .workout-meta,
 .quick-tools span {
   color: var(--muted);
@@ -680,6 +684,34 @@ input[aria-invalid="true"] {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.test-predictor-grid {
+  grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.test-estimate {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.test-estimate article {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 22px;
+}
+
+.test-estimate strong {
+  color: var(--track-dark);
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1;
+}
+
+.test-estimate p {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
 .standards-table {
   overflow: hidden;
 }
@@ -713,6 +745,7 @@ input[aria-invalid="true"] {
   .hero,
   .tool-grid,
   .planner-grid,
+  .test-predictor-grid,
   .results {
     grid-template-columns: 1fr;
   }
@@ -726,6 +759,7 @@ input[aria-invalid="true"] {
   .projection-grid,
   .zone-grid,
   .race-strategy-grid,
+  .test-estimate,
   .workout-grid,
   .cards-three,
   .knowledge-grid {
@@ -758,6 +792,7 @@ input[aria-invalid="true"] {
   .projection-grid,
   .zone-grid,
   .race-strategy-grid,
+  .test-estimate,
   .workout-grid,
   .cards-three,
   .knowledge-grid,

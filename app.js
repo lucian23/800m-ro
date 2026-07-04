@@ -13,15 +13,20 @@ const raceStartTime = document.querySelector("#raceStartTime");
 const warmupType = document.querySelector("#warmupType");
 const warmupPlan = document.querySelector("#warmupPlan");
 const workoutGrid = document.querySelector("#workoutGrid");
+const testPredictorForm = document.querySelector("#testPredictorForm");
+const testType = document.querySelector("#testType");
+const testTime = document.querySelector("#testTime");
 const personalStrategy = document.querySelector("#personalStrategy");
 const filterButtons = document.querySelectorAll(".filter");
 const copyPace = document.querySelector("#copyPace");
 const sharePace = document.querySelector("#sharePace");
 const copyPlan = document.querySelector("#copyPlan");
 const copyWarmup = document.querySelector("#copyWarmup");
+const copyTestEstimate = document.querySelector("#copyTestEstimate");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const warmupStatus = document.querySelector("#warmupStatus");
+const testStatus = document.querySelector("#testStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
@@ -41,7 +46,10 @@ const fields = {
   zoneSpecific: document.querySelector("#zoneSpecific"),
   zoneEndurance: document.querySelector("#zoneEndurance"),
   zoneTempo: document.querySelector("#zoneTempo"),
-  zoneEasy: document.querySelector("#zoneEasy")
+  zoneEasy: document.querySelector("#zoneEasy"),
+  estimated800: document.querySelector("#estimated800"),
+  estimateConfidence: document.querySelector("#estimateConfidence"),
+  estimateAdvice: document.querySelector("#estimateAdvice")
 };
 
 const workouts = [
@@ -209,6 +217,8 @@ function buildSettingsUrl() {
   url.searchParams.set("sedinte", sessionsPerWeek.value);
   url.searchParams.set("start", raceStartTime.value);
   url.searchParams.set("incalzire", warmupType.value);
+  url.searchParams.set("test", testType.value);
+  url.searchParams.set("testt", testTime.value.trim());
   url.hash = window.location.hash || "calculator";
   return url;
 }
@@ -229,7 +239,9 @@ function restoreFromUrl() {
     seasonPhase: params.get("perioada"),
     sessionsPerWeek: params.get("sedinte"),
     raceStartTime: params.get("start"),
-    warmupType: params.get("incalzire")
+    warmupType: params.get("incalzire"),
+    testType: params.get("test"),
+    testTime: params.get("testt")
   };
 
   if (values.targetTime) targetTime.value = values.targetTime;
@@ -241,6 +253,8 @@ function restoreFromUrl() {
   if (values.sessionsPerWeek) sessionsPerWeek.value = values.sessionsPerWeek;
   if (/^\d{2}:\d{2}$/.test(values.raceStartTime || "")) raceStartTime.value = values.raceStartTime;
   if ([...warmupType.options].some((option) => option.value === values.warmupType)) warmupType.value = values.warmupType;
+  if ([...testType.options].some((option) => option.value === values.testType)) testType.value = values.testType;
+  if (values.testTime) testTime.value = values.testTime;
 }
 
 function splitPlan(totalSeconds, profile) {
@@ -492,6 +506,70 @@ function warmupSummary() {
   ].join("\n");
 }
 
+function testEstimateConfig(type) {
+  return {
+    300: {
+      factor: 2.95,
+      confidence: "medie",
+      min: 32,
+      max: 58,
+      advice: "Testul de 300 m arata viteza utilizabila. Daca estimarea pare optimista, lipseste probabil rezistenta specifica pe 500-700 m."
+    },
+    500: {
+      factor: 1.56,
+      confidence: "buna",
+      min: 65,
+      max: 105,
+      advice: "500 m controlat este un reper bun pentru zona grea a cursei. Urmareste daca tehnica ramane stabila dupa 350 m."
+    },
+    600: {
+      factor: 1.36,
+      confidence: "buna",
+      min: 78,
+      max: 135,
+      advice: "600 m este aproape de specificul probei. Daca ultimii 150 m cad mult, obiectivul de 800 m trebuie ajustat conservator."
+    },
+    1000: {
+      factor: 0.76,
+      confidence: "medie",
+      min: 145,
+      max: 230,
+      advice: "1000 m arata sprijinul aerob si controlul. Pentru 800 m mai conteaza viteza si toleranta la schimbari de ritm."
+    }
+  }[type];
+}
+
+function updateTestEstimate() {
+  const seconds = parseTime(testTime.value);
+  const config = testEstimateConfig(testType.value);
+
+  if (!seconds || seconds < config.min || seconds > config.max) {
+    testTime.setAttribute("aria-invalid", "true");
+    fields.estimated800.textContent = "--";
+    fields.estimateConfidence.textContent = "verifica timpul";
+    fields.estimateAdvice.textContent = `Pentru testul selectat, introdu un timp realist intre ${formatTime(config.min)} si ${formatTime(config.max)}.`;
+    syncUrlState();
+    return;
+  }
+
+  testTime.removeAttribute("aria-invalid");
+  const estimate = seconds * config.factor;
+  fields.estimated800.textContent = formatTime(estimate);
+  fields.estimateConfidence.textContent = config.confidence;
+  fields.estimateAdvice.textContent = config.advice;
+  syncUrlState();
+}
+
+function testEstimateSummary() {
+  return [
+    `Estimator 800 m din test: ${testType.selectedOptions[0].textContent}`,
+    `Timp test: ${testTime.value}`,
+    `Estimare 800 m: ${fields.estimated800.textContent}`,
+    `Incredere: ${fields.estimateConfidence.textContent}`,
+    `Interpretare: ${fields.estimateAdvice.textContent}`
+  ].join("\n");
+}
+
 function updatePlan() {
   const level = athleteLevel.value;
   const phase = seasonPhase.value;
@@ -545,10 +623,13 @@ plannerForm.addEventListener("input", enableUrlSync(updatePlan));
 plannerForm.addEventListener("change", enableUrlSync(updatePlan));
 warmupForm.addEventListener("input", enableUrlSync(updateWarmup));
 warmupForm.addEventListener("change", enableUrlSync(updateWarmup));
+testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
+testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 copyPace.addEventListener("click", () => copyText(paceSummary(), paceStatus, "Rezultatul a fost copiat."));
 sharePace.addEventListener("click", () => copyText(buildSettingsUrl().toString(), paceStatus, "Linkul cu setarile a fost copiat."));
 copyPlan.addEventListener("click", () => copyText(planSummary(), planStatus, "Planul saptamanal a fost copiat."));
 copyWarmup.addEventListener("click", () => copyText(warmupSummary(), warmupStatus, "Incalzirea a fost copiata."));
+copyTestEstimate.addEventListener("click", () => copyText(testEstimateSummary(), testStatus, "Estimarea a fost copiata."));
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -562,4 +643,5 @@ restoreFromUrl();
 updateCalculator();
 updatePlan();
 updateWarmup();
+updateTestEstimate();
 renderWorkouts();

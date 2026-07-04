@@ -8,14 +8,20 @@ const athleteLevel = document.querySelector("#athleteLevel");
 const seasonPhase = document.querySelector("#seasonPhase");
 const sessionsPerWeek = document.querySelector("#sessionsPerWeek");
 const weekPlan = document.querySelector("#weekPlan");
+const warmupForm = document.querySelector("#warmupForm");
+const raceStartTime = document.querySelector("#raceStartTime");
+const warmupType = document.querySelector("#warmupType");
+const warmupPlan = document.querySelector("#warmupPlan");
 const workoutGrid = document.querySelector("#workoutGrid");
 const personalStrategy = document.querySelector("#personalStrategy");
 const filterButtons = document.querySelectorAll(".filter");
 const copyPace = document.querySelector("#copyPace");
 const sharePace = document.querySelector("#sharePace");
 const copyPlan = document.querySelector("#copyPlan");
+const copyWarmup = document.querySelector("#copyWarmup");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
+const warmupStatus = document.querySelector("#warmupStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
@@ -201,7 +207,9 @@ function buildSettingsUrl() {
   url.searchParams.set("nivel", athleteLevel.value);
   url.searchParams.set("perioada", seasonPhase.value);
   url.searchParams.set("sedinte", sessionsPerWeek.value);
-  url.hash = "calculator";
+  url.searchParams.set("start", raceStartTime.value);
+  url.searchParams.set("incalzire", warmupType.value);
+  url.hash = window.location.hash || "calculator";
   return url;
 }
 
@@ -219,7 +227,9 @@ function restoreFromUrl() {
     standardGender: params.get("gen"),
     athleteLevel: params.get("nivel"),
     seasonPhase: params.get("perioada"),
-    sessionsPerWeek: params.get("sedinte")
+    sessionsPerWeek: params.get("sedinte"),
+    raceStartTime: params.get("start"),
+    warmupType: params.get("incalzire")
   };
 
   if (values.targetTime) targetTime.value = values.targetTime;
@@ -229,6 +239,8 @@ function restoreFromUrl() {
   if ([...athleteLevel.options].some((option) => option.value === values.athleteLevel)) athleteLevel.value = values.athleteLevel;
   if ([...seasonPhase.options].some((option) => option.value === values.seasonPhase)) seasonPhase.value = values.seasonPhase;
   if (values.sessionsPerWeek) sessionsPerWeek.value = values.sessionsPerWeek;
+  if (/^\d{2}:\d{2}$/.test(values.raceStartTime || "")) raceStartTime.value = values.raceStartTime;
+  if ([...warmupType.options].some((option) => option.value === values.warmupType)) warmupType.value = values.warmupType;
 }
 
 function splitPlan(totalSeconds, profile) {
@@ -418,6 +430,68 @@ function updateCalculator() {
   syncUrlState();
 }
 
+function timeOffset(timeValue, minutesDelta) {
+  const [hours, minutes] = timeValue.split(":").map(Number);
+  const total = (hours * 60 + minutes + minutesDelta + 24 * 60) % (24 * 60);
+  const hh = String(Math.floor(total / 60)).padStart(2, "0");
+  const mm = String(total % 60).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
+
+function warmupSteps(type) {
+  const plans = {
+    race: [
+      [-55, "Sosire si verificare", "Numar, pantofi, hidratare mica, fara stat inutil in picioare."],
+      [-45, "Jogging usor", "10-14 min progresiv, respiratie linistita."],
+      [-30, "Mobilitate + drill-uri", "Sold, glezna, skipping, pendulari, 2-3 exercitii bine cunoscute."],
+      [-18, "Accelerari", "3-4 x 60-80 m progresiv, ultima aproape de ritmul de cursa."],
+      [-10, "Camera de apel / zona start", "Bluza pe tine, respiratie, scenariu tactic in 2 propozitii."],
+      [-3, "Activare finala", "2 porniri scurte, postura inalta, primii 200 m clari in minte."]
+    ],
+    test: [
+      [-45, "Jogging usor", "8-12 min, suficient cat sa intri cald fara consum."],
+      [-30, "Mobilitate dinamica", "Drill-uri simple si 2 linii relaxate."],
+      [-18, "Ritm de control", "2 x 80 m progresiv, pauza completa."],
+      [-8, "Pregatire start", "Noteaza obiectivul testului: ritm, tehnica sau toleranta."],
+      [-2, "Pornire", "O singura intentie: executie curata, nu sprint din primul pas."]
+    ],
+    workout: [
+      [-35, "Jogging + mobilitate", "10 min usor, apoi glezna/sold/spate."],
+      [-22, "Drill-uri", "Skipping, pendulari, alergare cu genunchiul jos, contact scurt."],
+      [-12, "Linii", "3 x 80 m progresiv, revenire completa."],
+      [-5, "Pauza activa", "Verifica ritmul primei repetari si durata pauzelor."],
+      [0, "Prima repetare", "Incepe controlat: calitatea decide sedinta." ]
+    ]
+  };
+  return plans[type];
+}
+
+function updateWarmup() {
+  const start = raceStartTime.value || "18:30";
+  const steps = warmupSteps(warmupType.value);
+  warmupPlan.innerHTML = steps.map(([offset, title, text]) => `
+    <div class="warmup-row">
+      <strong>${timeOffset(start, offset)}</strong>
+      <div><span>${title}</span><p>${text}</p></div>
+    </div>
+  `).join("");
+  syncUrlState();
+}
+
+function warmupSummary() {
+  const rows = [...warmupPlan.querySelectorAll(".warmup-row")].map((row) => {
+    const time = row.querySelector("strong").textContent;
+    const title = row.querySelector("span").textContent;
+    const text = row.querySelector("p").textContent;
+    return `${time} — ${title}: ${text}`;
+  });
+
+  return [
+    `Incalzire 800 m: ${warmupType.selectedOptions[0].textContent}, start ${raceStartTime.value}`,
+    ...rows
+  ].join("\n");
+}
+
 function updatePlan() {
   const level = athleteLevel.value;
   const phase = seasonPhase.value;
@@ -469,9 +543,12 @@ trainingFocus.addEventListener("change", enableUrlSync(updateCalculator));
 standardGender.addEventListener("change", enableUrlSync(updateCalculator));
 plannerForm.addEventListener("input", enableUrlSync(updatePlan));
 plannerForm.addEventListener("change", enableUrlSync(updatePlan));
+warmupForm.addEventListener("input", enableUrlSync(updateWarmup));
+warmupForm.addEventListener("change", enableUrlSync(updateWarmup));
 copyPace.addEventListener("click", () => copyText(paceSummary(), paceStatus, "Rezultatul a fost copiat."));
 sharePace.addEventListener("click", () => copyText(buildSettingsUrl().toString(), paceStatus, "Linkul cu setarile a fost copiat."));
 copyPlan.addEventListener("click", () => copyText(planSummary(), planStatus, "Planul saptamanal a fost copiat."));
+copyWarmup.addEventListener("click", () => copyText(warmupSummary(), warmupStatus, "Incalzirea a fost copiata."));
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -484,4 +561,5 @@ filterButtons.forEach((button) => {
 restoreFromUrl();
 updateCalculator();
 updatePlan();
+updateWarmup();
 renderWorkouts();

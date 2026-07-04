@@ -32,6 +32,7 @@
       <nav class="nav" aria-label="Navigare principala">
         <a href="#calculator">Calculator</a>
         <a href="#planificator">Planificator</a>
+        <a href="#incalzire">Incalzire</a>
         <a href="#strategie">Strategie</a>
         <a href="#antrenamente">Antrenamente</a>
         <a href="#teste">Teste</a>
@@ -216,6 +217,34 @@
         </div>
       </section>
 
+      <section id="incalzire" class="section warmup-section">
+        <div class="section-heading">
+          <p class="eyebrow">Ziua cursei</p>
+          <h2>Generator de incalzire pentru 800 m</h2>
+          <p>Alege ora startului si tipul sesiunii. Instrumentul construieste o cronologie simpla pentru jogging, mobilitate, drill-uri, accelerari si intrarea in camera de apel.</p>
+        </div>
+
+        <div class="planner-grid">
+          <form class="planner-form" id="warmupForm">
+            <label>
+              Ora startului
+              <input id="raceStartTime" type="time" value="18:30">
+            </label>
+            <label>
+              Tip sesiune
+              <select id="warmupType">
+                <option value="race">Concurs</option>
+                <option value="test">Test / time trial</option>
+                <option value="workout">Antrenament specific</option>
+              </select>
+            </label>
+            <button class="button secondary" id="copyWarmup" type="button">Copiaza incalzirea</button>
+            <p class="status-message" id="warmupStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="warmup-plan" id="warmupPlan" aria-live="polite"></div>
+        </div>
+      </section>
+
       <section id="strategie" class="section race-model">
         <div class="section-heading">
           <p class="eyebrow">Strategie</p>
@@ -293,6 +322,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-03">3 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=benchmarks-20260703"></script>
+    <script src="app.js?v=warmup-20260703"></script>
   </body>
 </html>

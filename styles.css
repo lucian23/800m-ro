@@ -280,6 +280,7 @@ h3 {
 .planner-form,
 .results,
 .week-plan,
+.warmup-plan,
 .projection-grid article,
 .zone-grid article,
 .race-strategy-grid article,
@@ -539,7 +540,8 @@ input[aria-invalid="true"] {
 }
 
 .planner-section,
-.tests-section {
+.tests-section,
+.warmup-section {
   background: #fbfaf6;
 }
 
@@ -548,6 +550,38 @@ input[aria-invalid="true"] {
   gap: 1px;
   overflow: hidden;
   background: var(--line);
+}
+
+.warmup-plan {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.warmup-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 18px;
+  padding: 16px 18px;
+  background: var(--panel);
+}
+
+.warmup-row strong {
+  color: var(--track-dark);
+  font-size: 22px;
+}
+
+.warmup-row span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.warmup-row p {
+  margin-bottom: 0;
+  color: var(--muted);
 }
 
 .day-row {
@@ -731,7 +765,8 @@ input[aria-invalid="true"] {
     grid-template-columns: 1fr;
   }
 
-  .day-row {
+  .day-row,
+  .warmup-row {
     grid-template-columns: 1fr;
     gap: 6px;
   }

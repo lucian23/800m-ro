@@ -262,6 +262,8 @@ h3 {
 .projection-grid,
 .zone-grid,
 .race-strategy-grid,
+.checklist-grid,
+.checklist-items,
 .test-predictor-grid,
 .test-estimate,
 .timeline,
@@ -286,6 +288,8 @@ h3 {
 .projection-grid article,
 .zone-grid article,
 .race-strategy-grid article,
+.checklist-progress,
+.checklist-item,
 .test-estimate article,
 .timeline article,
 .workout,
@@ -311,6 +315,7 @@ h3 {
 .projection-grid span,
 .zone-grid span,
 .race-strategy-grid span,
+.checklist-progress span,
 .test-estimate span,
 .workout-meta,
 .quick-tools span {
@@ -545,7 +550,8 @@ input[aria-invalid="true"] {
 
 .planner-section,
 .tests-section,
-.warmup-section {
+.warmup-section,
+.checklist-section {
   background: #fbfaf6;
 }
 
@@ -586,6 +592,69 @@ input[aria-invalid="true"] {
 .warmup-row p {
   margin-bottom: 0;
   color: var(--muted);
+}
+
+.checklist-grid {
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.checklist-progress {
+  position: sticky;
+  top: 92px;
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+}
+
+.checklist-progress strong {
+  color: var(--track-dark);
+  font-size: clamp(42px, 6vw, 66px);
+  line-height: 1;
+}
+
+.checklist-progress p {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.checklist-items {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.checklist-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  min-height: 132px;
+  padding: 18px;
+  cursor: pointer;
+}
+
+.checklist-item:has(input:checked) {
+  border-color: rgba(15, 124, 117, 0.36);
+  background: linear-gradient(180deg, #fff 0%, rgba(15, 124, 117, 0.08) 100%);
+}
+
+.checklist-item input {
+  width: 20px;
+  min-height: 20px;
+  margin-top: 3px;
+  accent-color: var(--accent);
+}
+
+.checklist-item strong,
+.checklist-item em {
+  display: block;
+}
+
+.checklist-item em {
+  margin-top: 5px;
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 400;
 }
 
 .day-row {
@@ -745,6 +814,7 @@ input[aria-invalid="true"] {
   .hero,
   .tool-grid,
   .planner-grid,
+  .checklist-grid,
   .test-predictor-grid,
   .results {
     grid-template-columns: 1fr;
@@ -759,6 +829,7 @@ input[aria-invalid="true"] {
   .projection-grid,
   .zone-grid,
   .race-strategy-grid,
+  .checklist-items,
   .test-estimate,
   .workout-grid,
   .cards-three,
@@ -787,11 +858,16 @@ input[aria-invalid="true"] {
     min-height: 340px;
   }
 
+  .checklist-progress {
+    position: static;
+  }
+
   .quick-tools,
   .timeline,
   .projection-grid,
   .zone-grid,
   .race-strategy-grid,
+  .checklist-items,
   .test-estimate,
   .workout-grid,
   .cards-three,

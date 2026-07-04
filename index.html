@@ -33,6 +33,7 @@
         <a href="#calculator">Calculator</a>
         <a href="#planificator">Planificator</a>
         <a href="#incalzire">Incalzire</a>
+        <a href="#checklist">Checklist</a>
         <a href="#strategie">Strategie</a>
         <a href="#antrenamente">Antrenamente</a>
         <a href="#teste">Teste</a>
@@ -245,6 +246,28 @@
         </div>
       </section>
 
+      <section id="checklist" class="section checklist-section">
+        <div class="section-heading">
+          <p class="eyebrow">Organizare</p>
+          <h2>Checklist pentru ziua cursei</h2>
+          <p>Bifeaza lucrurile care trebuie rezolvate inainte si dupa cursa. Checklistul ramane salvat in browser si poate fi copiat pentru sportiv, parinte sau antrenor.</p>
+        </div>
+
+        <div class="checklist-grid">
+          <div class="checklist-progress" aria-live="polite">
+            <span>Progres</span>
+            <strong id="checklistProgress">0/8</strong>
+            <p id="checklistNext">Primul pas: verifica echipamentul.</p>
+            <div class="tool-actions">
+              <button class="button secondary small" id="copyChecklist" type="button">Copiaza checklistul</button>
+              <button class="button secondary small" id="resetChecklist" type="button">Reseteaza</button>
+            </div>
+            <p class="status-message" id="checklistStatus" role="status" aria-live="polite"></p>
+          </div>
+          <div class="checklist-items" id="raceChecklist"></div>
+        </div>
+      </section>
+
       <section id="strategie" class="section race-model">
         <div class="section-heading">
           <p class="eyebrow">Strategie</p>
@@ -352,6 +375,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-04">4 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=test-estimator-20260704"></script>
+    <script src="app.js?v=checklist-20260704"></script>
   </body>
 </html>

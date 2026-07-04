@@ -12,6 +12,7 @@ const warmupForm = document.querySelector("#warmupForm");
 const raceStartTime = document.querySelector("#raceStartTime");
 const warmupType = document.querySelector("#warmupType");
 const warmupPlan = document.querySelector("#warmupPlan");
+const raceChecklist = document.querySelector("#raceChecklist");
 const workoutGrid = document.querySelector("#workoutGrid");
 const testPredictorForm = document.querySelector("#testPredictorForm");
 const testType = document.querySelector("#testType");
@@ -22,10 +23,13 @@ const copyPace = document.querySelector("#copyPace");
 const sharePace = document.querySelector("#sharePace");
 const copyPlan = document.querySelector("#copyPlan");
 const copyWarmup = document.querySelector("#copyWarmup");
+const copyChecklist = document.querySelector("#copyChecklist");
+const resetChecklist = document.querySelector("#resetChecklist");
 const copyTestEstimate = document.querySelector("#copyTestEstimate");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const warmupStatus = document.querySelector("#warmupStatus");
+const checklistStatus = document.querySelector("#checklistStatus");
 const testStatus = document.querySelector("#testStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
@@ -47,6 +51,8 @@ const fields = {
   zoneEndurance: document.querySelector("#zoneEndurance"),
   zoneTempo: document.querySelector("#zoneTempo"),
   zoneEasy: document.querySelector("#zoneEasy"),
+  checklistProgress: document.querySelector("#checklistProgress"),
+  checklistNext: document.querySelector("#checklistNext"),
   estimated800: document.querySelector("#estimated800"),
   estimateConfidence: document.querySelector("#estimateConfidence"),
   estimateAdvice: document.querySelector("#estimateAdvice")
@@ -110,6 +116,19 @@ const workouts = [
 ];
 
 const dayNames = ["Luni", "Marti", "Miercuri", "Joi", "Vineri", "Sambata", "Duminica"];
+
+const checklistItems = [
+  { id: "gear", title: "Echipament verificat", text: "Cuie/pantofi, sosete, sort, tricou, numar de concurs si ace." },
+  { id: "logistics", title: "Logistica clara", text: "Ora startului, camera de apel, traseul pana la pista si locul de incalzire." },
+  { id: "fuel", title: "Hidratare si gustare", text: "Apa in inghitituri mici si gustare cunoscuta, fara experimente in ziua cursei." },
+  { id: "warmup", title: "Incalzire planificata", text: "Jogging, mobilitate, drill-uri si accelerari sincronizate cu startul." },
+  { id: "tactics", title: "Plan tactic scurt", text: "Primii 200 m, pozitia la 400 m si decizia din zona 500-700 m." },
+  { id: "focus", title: "Cuvinte-cheie", text: "Doua repere simple: postura inalta si brate active cand apare oboseala." },
+  { id: "recovery", title: "Dupa cursa", text: "Revenire usoara, haine uscate, hidratare si notite despre senzatii." },
+  { id: "feedback", title: "Feedback notat", text: "Ce a mers, ce trebuie ajustat si o singura prioritate pentru urmatoarea saptamana." }
+];
+
+const checklistStorageKey = "800mRaceChecklist";
 
 const planTemplates = {
   base: {
@@ -506,6 +525,65 @@ function warmupSummary() {
   ].join("\n");
 }
 
+function readChecklistState() {
+  try {
+    return JSON.parse(window.localStorage.getItem(checklistStorageKey) || "{}");
+  } catch (error) {
+    return {};
+  }
+}
+
+function saveChecklistState(state) {
+  try {
+    window.localStorage.setItem(checklistStorageKey, JSON.stringify(state));
+  } catch (error) {
+    // Local storage can be unavailable in private contexts; the checklist still works during the session.
+  }
+}
+
+function updateChecklistProgress() {
+  const checked = [...raceChecklist.querySelectorAll("input[type='checkbox']")].filter((item) => item.checked);
+  const next = [...raceChecklist.querySelectorAll("input[type='checkbox']")].find((item) => !item.checked);
+
+  fields.checklistProgress.textContent = `${checked.length}/${checklistItems.length}`;
+  fields.checklistNext.textContent = next
+    ? `Urmatorul pas: ${next.closest("label").querySelector("strong").textContent}.`
+    : "Checklist complet. Ramane doar executia cursei si feedback-ul.";
+}
+
+function renderChecklist() {
+  const state = readChecklistState();
+  raceChecklist.innerHTML = checklistItems.map((item) => `
+    <label class="checklist-item">
+      <input type="checkbox" value="${item.id}" ${state[item.id] ? "checked" : ""}>
+      <span><strong>${item.title}</strong><em>${item.text}</em></span>
+    </label>
+  `).join("");
+  updateChecklistProgress();
+}
+
+function checklistSummary() {
+  const lines = [...raceChecklist.querySelectorAll(".checklist-item")].map((item) => {
+    const marker = item.querySelector("input").checked ? "[x]" : "[ ]";
+    const title = item.querySelector("strong").textContent;
+    const text = item.querySelector("em").textContent;
+    return `${marker} ${title}: ${text}`;
+  });
+
+  return ["Checklist ziua cursei 800 m", ...lines].join("\n");
+}
+
+function resetChecklistState() {
+  saveChecklistState({});
+  const manualBox = document.querySelector("#checklistStatusManualCopy");
+  if (manualBox) {
+    manualBox.hidden = true;
+    manualBox.value = "";
+  }
+  renderChecklist();
+  setStatus(checklistStatus, "Checklistul a fost resetat.");
+}
+
 function testEstimateConfig(type) {
   return {
     300: {
@@ -629,7 +707,16 @@ copyPace.addEventListener("click", () => copyText(paceSummary(), paceStatus, "Re
 sharePace.addEventListener("click", () => copyText(buildSettingsUrl().toString(), paceStatus, "Linkul cu setarile a fost copiat."));
 copyPlan.addEventListener("click", () => copyText(planSummary(), planStatus, "Planul saptamanal a fost copiat."));
 copyWarmup.addEventListener("click", () => copyText(warmupSummary(), warmupStatus, "Incalzirea a fost copiata."));
+copyChecklist.addEventListener("click", () => copyText(checklistSummary(), checklistStatus, "Checklistul a fost copiat."));
+resetChecklist.addEventListener("click", resetChecklistState);
 copyTestEstimate.addEventListener("click", () => copyText(testEstimateSummary(), testStatus, "Estimarea a fost copiata."));
+raceChecklist.addEventListener("change", (event) => {
+  if (!event.target.matches("input[type='checkbox']")) return;
+  const state = readChecklistState();
+  state[event.target.value] = event.target.checked;
+  saveChecklistState(state);
+  updateChecklistProgress();
+});
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -643,5 +730,6 @@ restoreFromUrl();
 updateCalculator();
 updatePlan();
 updateWarmup();
+renderChecklist();
 updateTestEstimate();
 renderWorkouts();

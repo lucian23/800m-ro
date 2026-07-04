@@ -34,6 +34,7 @@
         <a href="#planificator">Planificator</a>
         <a href="#incalzire">Incalzire</a>
         <a href="#checklist">Checklist</a>
+        <a href="#fisa">Fisa</a>
         <a href="#strategie">Strategie</a>
         <a href="#antrenamente">Antrenamente</a>
         <a href="#teste">Teste</a>
@@ -294,6 +295,33 @@
         </div>
       </section>
 
+      <section id="fisa" class="section sheet-section">
+        <div class="section-heading">
+          <p class="eyebrow">Export</p>
+          <h2>Fisa sportivului pentru 800 m</h2>
+          <p>Genereaza o fisa scurta cu obiectivul, spliturile, saptamana, scara sezonului, incalzirea si analiza. Poate fi copiata sau printata pentru sedinta cu sportivul.</p>
+        </div>
+
+        <div class="sheet-grid">
+          <form class="planner-form" id="athleteSheetForm">
+            <label>
+              Nume sportiv
+              <input id="athleteName" type="text" value="Sportiv 800 m">
+            </label>
+            <label>
+              Concurs / obiectiv
+              <input id="competitionName" type="text" value="Obiectiv sezon">
+            </label>
+            <div class="tool-actions">
+              <button class="button secondary" id="copyAthleteSheet" type="button">Copiaza fisa</button>
+              <button class="button secondary" id="printAthleteSheet" type="button">Printeaza</button>
+            </div>
+            <p class="status-message" id="sheetStatus" role="status" aria-live="polite"></p>
+          </form>
+          <article class="sheet-preview" id="sheetPreview" aria-live="polite"></article>
+        </div>
+      </section>
+
       <section id="strategie" class="section race-model">
         <div class="section-heading">
           <p class="eyebrow">Strategie</p>
@@ -426,6 +454,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-04">4 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=goal-ladder-20260704"></script>
+    <script src="app.js?v=athlete-sheet-20260704"></script>
   </body>
 </html>

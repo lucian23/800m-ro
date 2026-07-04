@@ -17,6 +17,10 @@ const raceStartTime = document.querySelector("#raceStartTime");
 const warmupType = document.querySelector("#warmupType");
 const warmupPlan = document.querySelector("#warmupPlan");
 const raceChecklist = document.querySelector("#raceChecklist");
+const athleteSheetForm = document.querySelector("#athleteSheetForm");
+const athleteName = document.querySelector("#athleteName");
+const competitionName = document.querySelector("#competitionName");
+const sheetPreview = document.querySelector("#sheetPreview");
 const workoutGrid = document.querySelector("#workoutGrid");
 const testPredictorForm = document.querySelector("#testPredictorForm");
 const testType = document.querySelector("#testType");
@@ -33,6 +37,8 @@ const copyGoalLadder = document.querySelector("#copyGoalLadder");
 const copyWarmup = document.querySelector("#copyWarmup");
 const copyChecklist = document.querySelector("#copyChecklist");
 const resetChecklist = document.querySelector("#resetChecklist");
+const copyAthleteSheet = document.querySelector("#copyAthleteSheet");
+const printAthleteSheet = document.querySelector("#printAthleteSheet");
 const copyTestEstimate = document.querySelector("#copyTestEstimate");
 const copyRaceReview = document.querySelector("#copyRaceReview");
 const paceStatus = document.querySelector("#paceStatus");
@@ -40,6 +46,7 @@ const planStatus = document.querySelector("#planStatus");
 const goalStatus = document.querySelector("#goalStatus");
 const warmupStatus = document.querySelector("#warmupStatus");
 const checklistStatus = document.querySelector("#checklistStatus");
+const sheetStatus = document.querySelector("#sheetStatus");
 const testStatus = document.querySelector("#testStatus");
 const raceReviewStatus = document.querySelector("#raceReviewStatus");
 let stateSyncEnabled = window.location.search.length > 0;
@@ -259,6 +266,8 @@ function buildSettingsUrl() {
   url.searchParams.set("testt", testTime.value.trim());
   url.searchParams.set("rezultat", actualResult.value.trim());
   url.searchParams.set("s400", raceSplit400.value.trim());
+  url.searchParams.set("sportiv", athleteName.value.trim());
+  url.searchParams.set("concurs", competitionName.value.trim());
   url.hash = window.location.hash || "calculator";
   return url;
 }
@@ -285,7 +294,9 @@ function restoreFromUrl() {
     testType: params.get("test"),
     testTime: params.get("testt"),
     actualResult: params.get("rezultat"),
-    raceSplit400: params.get("s400")
+    raceSplit400: params.get("s400"),
+    athleteName: params.get("sportiv"),
+    competitionName: params.get("concurs")
   };
 
   if (values.targetTime) targetTime.value = values.targetTime;
@@ -303,6 +314,8 @@ function restoreFromUrl() {
   if (values.testTime) testTime.value = values.testTime;
   if (values.actualResult) actualResult.value = values.actualResult;
   if (values.raceSplit400) raceSplit400.value = values.raceSplit400;
+  if (values.athleteName) athleteName.value = values.athleteName;
+  if (values.competitionName) competitionName.value = values.competitionName;
 }
 
 function splitPlan(totalSeconds, profile) {
@@ -613,6 +626,44 @@ function resetChecklistState() {
   setStatus(checklistStatus, "Checklistul a fost resetat.");
 }
 
+function escapeHtml(value) {
+  return value.replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[char]));
+}
+
+function athleteSheetSummary() {
+  const checkedCount = [...raceChecklist.querySelectorAll("input[type='checkbox']")].filter((item) => item.checked).length;
+  const milestoneText = [...goalMilestones.querySelectorAll("div")].map((item) => `${item.querySelector("strong").textContent} ${item.querySelector("span").textContent}`);
+  return [
+    `Fisa 800 m — ${athleteName.value.trim() || "Sportiv"}`,
+    `Concurs / obiectiv: ${competitionName.value.trim() || "Obiectiv sezon"}`,
+    `Tinta: ${targetTime.value} | ritm mediu 200 m: ${fields.pacePer200.textContent}`,
+    `Splituri: 200 m ${fields.split200.textContent}, 400 m ${fields.split400.textContent}, 600 m ${fields.split600.textContent}, 800 m ${fields.split800.textContent}`,
+    `Nivel estimat: ${fields.performanceLevel.textContent} | ${fields.nextBenchmark.textContent}`,
+    `Scara sezonului: actual ${currentSeasonTime.value}, ${goalWeeks.value} saptamani, ${fields.weeklyGain.textContent}`,
+    ...milestoneText,
+    `Plan saptamana: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte`,
+    `Incalzire: ${warmupType.selectedOptions[0].textContent}, start ${raceStartTime.value}`,
+    `Checklist: ${checkedCount}/${checklistItems.length} bifate`,
+    `Analiza cursa: ${fields.raceDelta.textContent}; ${fields.lapBalance.textContent}`,
+    `Concluzie: ${fields.raceReviewAdvice.textContent}`
+  ].join("\n");
+}
+
+function renderAthleteSheet() {
+  const lines = athleteSheetSummary().split("\n");
+  sheetPreview.innerHTML = `
+    <h3>${escapeHtml(lines[0])}</h3>
+    <p>${escapeHtml(lines[1])}</p>
+    <ul>${lines.slice(2).map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>
+  `;
+  syncUrlState();
+}
+
+function printSheet() {
+  renderAthleteSheet();
+  window.print();
+}
+
 function testEstimateConfig(type) {
   return {
     300: {
@@ -845,6 +896,7 @@ function enableUrlSync(callback) {
   return (event) => {
     stateSyncEnabled = true;
     callback(event);
+    renderAthleteSheet();
   };
 }
 
@@ -870,13 +922,20 @@ testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
 raceReviewForm.addEventListener("change", enableUrlSync(updateRaceReview));
+athleteSheetForm.addEventListener("input", enableUrlSync(renderAthleteSheet));
+athleteSheetForm.addEventListener("change", enableUrlSync(renderAthleteSheet));
 copyPace.addEventListener("click", () => copyText(paceSummary(), paceStatus, "Rezultatul a fost copiat."));
 sharePace.addEventListener("click", () => copyText(buildSettingsUrl().toString(), paceStatus, "Linkul cu setarile a fost copiat."));
 copyPlan.addEventListener("click", () => copyText(planSummary(), planStatus, "Planul saptamanal a fost copiat."));
 copyGoalLadder.addEventListener("click", () => copyText(goalLadderSummary(), goalStatus, "Scara obiectivului a fost copiata."));
 copyWarmup.addEventListener("click", () => copyText(warmupSummary(), warmupStatus, "Incalzirea a fost copiata."));
 copyChecklist.addEventListener("click", () => copyText(checklistSummary(), checklistStatus, "Checklistul a fost copiat."));
-resetChecklist.addEventListener("click", resetChecklistState);
+resetChecklist.addEventListener("click", () => {
+  resetChecklistState();
+  renderAthleteSheet();
+});
+copyAthleteSheet.addEventListener("click", () => copyText(athleteSheetSummary(), sheetStatus, "Fisa a fost copiata."));
+printAthleteSheet.addEventListener("click", printSheet);
 copyTestEstimate.addEventListener("click", () => copyText(testEstimateSummary(), testStatus, "Estimarea a fost copiata."));
 copyRaceReview.addEventListener("click", () => copyText(raceReviewSummary(), raceReviewStatus, "Analiza a fost copiata."));
 raceChecklist.addEventListener("change", (event) => {
@@ -885,6 +944,7 @@ raceChecklist.addEventListener("change", (event) => {
   state[event.target.value] = event.target.checked;
   saveChecklistState(state);
   updateChecklistProgress();
+  renderAthleteSheet();
 });
 
 filterButtons.forEach((button) => {
@@ -903,4 +963,5 @@ updateWarmup();
 renderChecklist();
 updateTestEstimate();
 updateRaceReview();
+renderAthleteSheet();
 renderWorkouts();

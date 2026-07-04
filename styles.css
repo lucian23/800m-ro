@@ -267,6 +267,7 @@ h3 {
 .test-predictor-grid,
 .race-review-grid,
 .goal-ladder-grid,
+.sheet-grid,
 .test-estimate,
 .race-review-results,
 .goal-ladder-results,
@@ -298,6 +299,7 @@ h3 {
 .race-review-results article,
 .goal-ladder-results article,
 .goal-milestones,
+.sheet-preview,
 .timeline article,
 .workout,
 .cards-three article,
@@ -560,7 +562,8 @@ input[aria-invalid="true"] {
 .planner-section,
 .tests-section,
 .warmup-section,
-.checklist-section {
+.checklist-section,
+.sheet-section {
   background: #fbfaf6;
 }
 
@@ -851,6 +854,42 @@ input[aria-invalid="true"] {
   font-weight: 900;
 }
 
+.sheet-grid {
+  grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.sheet-preview {
+  padding: 24px;
+  background: linear-gradient(180deg, #fff 0%, #fbfaf6 100%);
+}
+
+.sheet-preview h3 {
+  margin-bottom: 6px;
+}
+
+.sheet-preview p {
+  color: var(--muted);
+}
+
+.sheet-preview ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.sheet-preview li {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sheet-preview li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
 .standards-table {
   overflow: hidden;
 }
@@ -888,6 +927,7 @@ input[aria-invalid="true"] {
   .test-predictor-grid,
   .race-review-grid,
   .goal-ladder-grid,
+  .sheet-grid,
   .results {
     grid-template-columns: 1fr;
   }
@@ -969,5 +1009,44 @@ input[aria-invalid="true"] {
 
   .footer {
     flex-direction: column;
+  }
+}
+
+@media print {
+  .site-header,
+  .hero,
+  .quick-tools,
+  .calculator-section,
+  .planner-section,
+  .warmup-section,
+  .checklist-section,
+  .race-model,
+  .workouts,
+  .tests-section,
+  .standards,
+  .knowledge-section,
+  .footer,
+  .sheet-section .section-heading,
+  .sheet-section .planner-form {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .sheet-section {
+    padding: 0;
+    background: #fff;
+  }
+
+  .sheet-grid,
+  .sheet-preview {
+    display: block;
+  }
+
+  .sheet-preview {
+    border: 0;
+    box-shadow: none;
   }
 }

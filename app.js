@@ -29,6 +29,9 @@ const raceReviewForm = document.querySelector("#raceReviewForm");
 const actualResult = document.querySelector("#actualResult");
 const raceSplit400 = document.querySelector("#raceSplit400");
 const personalStrategy = document.querySelector("#personalStrategy");
+const pacingScenarioForm = document.querySelector("#pacingScenarioForm");
+const pacingScenarioType = document.querySelector("#pacingScenarioType");
+const firstLapTarget = document.querySelector("#firstLapTarget");
 const filterButtons = document.querySelectorAll(".filter");
 const copyPace = document.querySelector("#copyPace");
 const sharePace = document.querySelector("#sharePace");
@@ -39,6 +42,7 @@ const copyChecklist = document.querySelector("#copyChecklist");
 const resetChecklist = document.querySelector("#resetChecklist");
 const copyAthleteSheet = document.querySelector("#copyAthleteSheet");
 const printAthleteSheet = document.querySelector("#printAthleteSheet");
+const copyPacingScenario = document.querySelector("#copyPacingScenario");
 const copyTestEstimate = document.querySelector("#copyTestEstimate");
 const copyRaceReview = document.querySelector("#copyRaceReview");
 const paceStatus = document.querySelector("#paceStatus");
@@ -47,6 +51,7 @@ const goalStatus = document.querySelector("#goalStatus");
 const warmupStatus = document.querySelector("#warmupStatus");
 const checklistStatus = document.querySelector("#checklistStatus");
 const sheetStatus = document.querySelector("#sheetStatus");
+const pacingScenarioStatus = document.querySelector("#pacingScenarioStatus");
 const testStatus = document.querySelector("#testStatus");
 const raceReviewStatus = document.querySelector("#raceReviewStatus");
 let stateSyncEnabled = window.location.search.length > 0;
@@ -79,7 +84,12 @@ const fields = {
   estimateAdvice: document.querySelector("#estimateAdvice"),
   raceDelta: document.querySelector("#raceDelta"),
   lapBalance: document.querySelector("#lapBalance"),
-  raceReviewAdvice: document.querySelector("#raceReviewAdvice")
+  raceReviewAdvice: document.querySelector("#raceReviewAdvice"),
+  scenarioFirstLap: document.querySelector("#scenarioFirstLap"),
+  scenarioSecondLap: document.querySelector("#scenarioSecondLap"),
+  scenarioBalance: document.querySelector("#scenarioBalance"),
+  scenarioAdvice: document.querySelector("#scenarioAdvice"),
+  scenarioSegments: document.querySelector("#scenarioSegments")
 };
 
 const workouts = [
@@ -268,6 +278,8 @@ function buildSettingsUrl() {
   url.searchParams.set("s400", raceSplit400.value.trim());
   url.searchParams.set("sportiv", athleteName.value.trim());
   url.searchParams.set("concurs", competitionName.value.trim());
+  url.searchParams.set("pacing", pacingScenarioType.value);
+  url.searchParams.set("p400", firstLapTarget.value.trim());
   url.hash = window.location.hash || "calculator";
   return url;
 }
@@ -296,7 +308,9 @@ function restoreFromUrl() {
     actualResult: params.get("rezultat"),
     raceSplit400: params.get("s400"),
     athleteName: params.get("sportiv"),
-    competitionName: params.get("concurs")
+    competitionName: params.get("concurs"),
+    pacingScenarioType: params.get("pacing"),
+    firstLapTarget: params.get("p400")
   };
 
   if (values.targetTime) targetTime.value = values.targetTime;
@@ -316,6 +330,8 @@ function restoreFromUrl() {
   if (values.raceSplit400) raceSplit400.value = values.raceSplit400;
   if (values.athleteName) athleteName.value = values.athleteName;
   if (values.competitionName) competitionName.value = values.competitionName;
+  if ([...pacingScenarioType.options].some((option) => option.value === values.pacingScenarioType)) pacingScenarioType.value = values.pacingScenarioType;
+  if (values.firstLapTarget) firstLapTarget.value = values.firstLapTarget;
 }
 
 function splitPlan(totalSeconds, profile) {
@@ -644,6 +660,7 @@ function athleteSheetSummary() {
     `Plan saptamana: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte`,
     `Incalzire: ${warmupType.selectedOptions[0].textContent}, start ${raceStartTime.value}`,
     `Checklist: ${checkedCount}/${checklistItems.length} bifate`,
+    `Pacing: primul 400 m ${fields.scenarioFirstLap.textContent}, turul doi ${fields.scenarioSecondLap.textContent}, balans ${fields.scenarioBalance.textContent}`,
     `Analiza cursa: ${fields.raceDelta.textContent}; ${fields.lapBalance.textContent}`,
     `Concluzie: ${fields.raceReviewAdvice.textContent}`
   ].join("\n");
@@ -731,6 +748,97 @@ function testEstimateSummary() {
 function signedSeconds(value) {
   const sign = value > 0 ? "+" : "";
   return `${sign}${value.toFixed(1)}s`;
+}
+
+function scenarioFirstLapFor(total, type) {
+  const factors = {
+    balanced: 0.495,
+    aggressive: 0.485,
+    conservative: 0.505
+  };
+  return total * (factors[type] || 0.495);
+}
+
+function pacingScenarioAdvice(balance, firstLap, total) {
+  const firstLapPercent = firstLap / total;
+  if (balance > 5) return "Scenariu foarte agresiv: primul tur consuma mult. Foloseste-l doar daca forma este confirmata si pozitia cere acest risc.";
+  if (balance > 2.2) return "Prim tur rapid: realist pentru multi alergatori de 800 m, dar zona 500-700 m devine decisiva.";
+  if (balance >= 0) return "Balans realist pentru 800 m: primul tur pune pozitie, dar lasa loc pentru executie.";
+  if (firstLapPercent > 0.51) return "Scenariu conservator: bun pentru finish progresiv, dar exista risc sa ramai blocat sau prea departe la 400 m.";
+  return "Finish foarte progresiv: ai nevoie de incredere, spatiu si schimbare de ritm devreme dupa 500 m.";
+}
+
+function updatePacingScenario() {
+  const target = parseTime(targetTime.value);
+  if (!target || target < 60 || target > 360) {
+    firstLapTarget.setAttribute("aria-invalid", "true");
+    fields.scenarioFirstLap.textContent = "--";
+    fields.scenarioSecondLap.textContent = "--";
+    fields.scenarioBalance.textContent = "verifica tinta";
+    fields.scenarioAdvice.textContent = "Introdu o tinta valida in calculatorul principal.";
+    fields.scenarioSegments.innerHTML = "";
+    syncUrlState();
+    return;
+  }
+
+  let firstLap = pacingScenarioType.value === "custom"
+    ? parseTime(firstLapTarget.value)
+    : scenarioFirstLapFor(target, pacingScenarioType.value);
+
+  if (pacingScenarioType.value !== "custom") {
+    firstLapTarget.value = formatTime(firstLap);
+  }
+
+  if (!firstLap || firstLap < target * 0.43 || firstLap > target * 0.57) {
+    firstLapTarget.setAttribute("aria-invalid", "true");
+    fields.scenarioFirstLap.textContent = "--";
+    fields.scenarioSecondLap.textContent = "--";
+    fields.scenarioBalance.textContent = "verifica splitul";
+    fields.scenarioAdvice.textContent = "Splitul de 400 m trebuie sa fie compatibil cu tinta finala.";
+    fields.scenarioSegments.innerHTML = "";
+    syncUrlState();
+    return;
+  }
+
+  firstLapTarget.removeAttribute("aria-invalid");
+  const secondLap = target - firstLap;
+  const balance = secondLap - firstLap;
+  const first200 = firstLap / 2 - 0.25;
+  const second200 = firstLap;
+  const third200 = firstLap + secondLap / 2 - 0.15;
+  const finish = target;
+
+  fields.scenarioFirstLap.textContent = formatTime(firstLap);
+  fields.scenarioSecondLap.textContent = formatTime(secondLap);
+  fields.scenarioBalance.textContent = signedSeconds(balance);
+  fields.scenarioAdvice.textContent = pacingScenarioAdvice(balance, firstLap, target);
+  fields.scenarioSegments.innerHTML = [
+    ["200 m", formatTime(first200), "pozitie fara sprint prelungit"],
+    ["400 m", formatTime(second200), "control si economie"],
+    ["600 m", formatTime(third200), "decizie tactica"],
+    ["800 m", formatTime(finish), "finish complet"]
+  ].map(([label, time, note]) => `<div><strong>${label}</strong><span>${time}</span><em>${note}</em></div>`).join("");
+  syncUrlState();
+}
+
+function pacingScenarioSummary() {
+  const segments = [...fields.scenarioSegments.querySelectorAll("div")].map((item) => {
+    const label = item.querySelector("strong").textContent;
+    const time = item.querySelector("span").textContent;
+    const note = item.querySelector("em").textContent;
+    return `${label}: ${time} — ${note}`;
+  });
+
+  return [
+    "Simulator pacing 800 m",
+    `Tinta: ${targetTime.value}`,
+    `Model: ${pacingScenarioType.selectedOptions[0].textContent}`,
+    `Primul 400 m: ${fields.scenarioFirstLap.textContent}`,
+    `Turul doi necesar: ${fields.scenarioSecondLap.textContent}`,
+    `Balans: ${fields.scenarioBalance.textContent}`,
+    `Citire tactica: ${fields.scenarioAdvice.textContent}`,
+    ...segments
+  ].join("\n");
 }
 
 function raceReviewAdvice(delta, balance) {
@@ -909,6 +1017,7 @@ form.addEventListener("submit", (event) => {
 targetTime.addEventListener("input", enableUrlSync(updateCalculator));
 targetTime.addEventListener("input", enableUrlSync(updateRaceReview));
 targetTime.addEventListener("input", enableUrlSync(updateGoalLadder));
+targetTime.addEventListener("input", enableUrlSync(updatePacingScenario));
 raceProfile.addEventListener("change", enableUrlSync(updateCalculator));
 trainingFocus.addEventListener("change", enableUrlSync(updateCalculator));
 standardGender.addEventListener("change", enableUrlSync(updateCalculator));
@@ -924,6 +1033,8 @@ raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
 raceReviewForm.addEventListener("change", enableUrlSync(updateRaceReview));
 athleteSheetForm.addEventListener("input", enableUrlSync(renderAthleteSheet));
 athleteSheetForm.addEventListener("change", enableUrlSync(renderAthleteSheet));
+pacingScenarioForm.addEventListener("input", enableUrlSync(updatePacingScenario));
+pacingScenarioForm.addEventListener("change", enableUrlSync(updatePacingScenario));
 copyPace.addEventListener("click", () => copyText(paceSummary(), paceStatus, "Rezultatul a fost copiat."));
 sharePace.addEventListener("click", () => copyText(buildSettingsUrl().toString(), paceStatus, "Linkul cu setarile a fost copiat."));
 copyPlan.addEventListener("click", () => copyText(planSummary(), planStatus, "Planul saptamanal a fost copiat."));
@@ -936,6 +1047,7 @@ resetChecklist.addEventListener("click", () => {
 });
 copyAthleteSheet.addEventListener("click", () => copyText(athleteSheetSummary(), sheetStatus, "Fisa a fost copiata."));
 printAthleteSheet.addEventListener("click", printSheet);
+copyPacingScenario.addEventListener("click", () => copyText(pacingScenarioSummary(), pacingScenarioStatus, "Scenariul de pacing a fost copiat."));
 copyTestEstimate.addEventListener("click", () => copyText(testEstimateSummary(), testStatus, "Estimarea a fost copiata."));
 copyRaceReview.addEventListener("click", () => copyText(raceReviewSummary(), raceReviewStatus, "Analiza a fost copiata."));
 raceChecklist.addEventListener("change", (event) => {
@@ -960,6 +1072,7 @@ updateCalculator();
 updatePlan();
 updateGoalLadder();
 updateWarmup();
+updatePacingScenario();
 renderChecklist();
 updateTestEstimate();
 updateRaceReview();

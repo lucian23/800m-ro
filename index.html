@@ -328,6 +328,38 @@
           <h2>Cursa de 800 m pe segmente</h2>
           <p>O cursa buna nu este doar un timp final. Este o succesiune de decizii: pozitie, economie, raspuns la schimbari si executie sub oboseala.</p>
         </div>
+        <div class="section-subheading">
+          <h3>Simulator de pacing pe doua tururi</h3>
+          <p>Alege un model pentru primul 400 m sau introdu manual splitul. Instrumentul arata turul doi necesar, balansul si riscul tactic pentru timpul tinta.</p>
+        </div>
+        <div class="pacing-scenario-grid">
+          <form class="planner-form" id="pacingScenarioForm">
+            <label>
+              Model pacing
+              <select id="pacingScenarioType">
+                <option value="balanced">Echilibrat: primul tur usor sub medie</option>
+                <option value="aggressive">Agresiv: pozitie castigata devreme</option>
+                <option value="conservative">Conservator: finish progresiv</option>
+                <option value="custom">Split 400 m manual</option>
+              </select>
+            </label>
+            <label>
+              Split primul 400 m
+              <input id="firstLapTarget" type="text" inputmode="decimal" value="58.4" aria-describedby="pacingHelp">
+            </label>
+            <p id="pacingHelp" class="hint">Tinta finala este timpul din calculator. Pentru model manual foloseste formatul 58.5 sau 1:01.0.</p>
+            <button class="button secondary" id="copyPacingScenario" type="button">Copiaza scenariul</button>
+            <p class="status-message" id="pacingScenarioStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="pacing-scenario-results" aria-live="polite">
+            <article><span>Primul 400 m</span><strong id="scenarioFirstLap">58.4</strong></article>
+            <article><span>Turul doi necesar</span><strong id="scenarioSecondLap">59.6</strong></article>
+            <article><span>Balans</span><strong id="scenarioBalance">+1.2s</strong></article>
+            <article class="scenario-advice"><span>Citire tactica</span><p id="scenarioAdvice">Balans realist pentru 800 m: primul tur pune pozitie, dar lasa loc pentru executie.</p></article>
+            <div class="scenario-segments" id="scenarioSegments"></div>
+          </div>
+        </div>
+
         <div class="timeline">
           <article><span>0-200</span><h3>Iesire ferma</h3><p>Accelereaza fara sprint lung, intra in ritm si ocupa pozitia inainte sa se aglomereze plutonul.</p></article>
           <article><span>200-400</span><h3>Ritm economic</h3><p>Pastreaza contactul cu grupul potrivit. Evita franarile, pasii laterali si schimbarile dese de culoar.</p></article>
@@ -454,6 +486,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-04">4 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=athlete-sheet-20260704"></script>
+    <script src="app.js?v=pacing-scenario-20260704"></script>
   </body>
 </html>

@@ -266,10 +266,12 @@ h3 {
 .checklist-items,
 .test-predictor-grid,
 .race-review-grid,
+.pacing-scenario-grid,
 .goal-ladder-grid,
 .sheet-grid,
 .test-estimate,
 .race-review-results,
+.pacing-scenario-results,
 .goal-ladder-results,
 .timeline,
 .workout-grid,
@@ -297,8 +299,10 @@ h3 {
 .checklist-item,
 .test-estimate article,
 .race-review-results article,
+.pacing-scenario-results article,
 .goal-ladder-results article,
 .goal-milestones,
+.scenario-segments,
 .sheet-preview,
 .timeline article,
 .workout,
@@ -327,6 +331,7 @@ h3 {
 .checklist-progress span,
 .test-estimate span,
 .race-review-results span,
+.pacing-scenario-results span,
 .goal-ladder-results span,
 .workout-meta,
 .quick-tools span {
@@ -777,6 +782,12 @@ input[aria-invalid="true"] {
   align-items: stretch;
 }
 
+.pacing-scenario-grid {
+  grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
 .goal-ladder-grid {
   grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
   gap: 24px;
@@ -785,7 +796,8 @@ input[aria-invalid="true"] {
 
 .test-estimate,
 .race-review-results,
-.goal-ladder-results {
+.goal-ladder-results,
+.pacing-scenario-results {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -795,7 +807,8 @@ input[aria-invalid="true"] {
 
 .test-estimate article,
 .race-review-results article,
-.goal-ladder-results article {
+.goal-ladder-results article,
+.pacing-scenario-results article {
   display: grid;
   gap: 10px;
   align-content: start;
@@ -804,22 +817,60 @@ input[aria-invalid="true"] {
 
 .test-estimate strong,
 .race-review-results strong,
-.goal-ladder-results strong {
+.goal-ladder-results strong,
+.pacing-scenario-results strong {
   color: var(--track-dark);
   font-size: clamp(30px, 4vw, 48px);
   line-height: 1;
 }
 
 #lapBalance,
-#weeklyGain {
+#weeklyGain,
+#scenarioSecondLap,
+#scenarioBalance {
   font-size: clamp(26px, 3vw, 38px);
 }
 
 .test-estimate p,
 .race-review-results p,
-.goal-ladder-results p {
+.goal-ladder-results p,
+.pacing-scenario-results p {
   margin-bottom: 0;
   color: var(--muted);
+}
+
+.pacing-scenario-results .scenario-advice,
+.pacing-scenario-results .scenario-segments {
+  grid-column: 1 / -1;
+}
+
+.scenario-segments {
+  overflow: hidden;
+}
+
+.scenario-segments div {
+  display: grid;
+  grid-template-columns: 96px 110px 1fr;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.scenario-segments div:last-child {
+  border-bottom: 0;
+}
+
+.scenario-segments strong {
+  color: var(--accent-dark);
+}
+
+.scenario-segments span {
+  font-weight: 900;
+}
+
+.scenario-segments em {
+  color: var(--muted);
+  font-style: normal;
 }
 
 .race-review-results article:last-child {
@@ -926,6 +977,7 @@ input[aria-invalid="true"] {
   .checklist-grid,
   .test-predictor-grid,
   .race-review-grid,
+  .pacing-scenario-grid,
   .goal-ladder-grid,
   .sheet-grid,
   .results {
@@ -945,6 +997,7 @@ input[aria-invalid="true"] {
   .test-estimate,
   .race-review-results,
   .goal-ladder-results,
+  .pacing-scenario-results,
   .workout-grid,
   .cards-three,
   .knowledge-grid {
@@ -985,6 +1038,7 @@ input[aria-invalid="true"] {
   .test-estimate,
   .race-review-results,
   .goal-ladder-results,
+  .pacing-scenario-results,
   .workout-grid,
   .cards-three,
   .knowledge-grid,
@@ -994,7 +1048,8 @@ input[aria-invalid="true"] {
 
   .day-row,
   .warmup-row,
-  .goal-milestones div {
+  .goal-milestones div,
+  .scenario-segments div {
     grid-template-columns: 1fr;
     gap: 6px;
   }

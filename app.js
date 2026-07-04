@@ -8,6 +8,10 @@ const athleteLevel = document.querySelector("#athleteLevel");
 const seasonPhase = document.querySelector("#seasonPhase");
 const sessionsPerWeek = document.querySelector("#sessionsPerWeek");
 const weekPlan = document.querySelector("#weekPlan");
+const goalLadderForm = document.querySelector("#goalLadderForm");
+const currentSeasonTime = document.querySelector("#currentSeasonTime");
+const goalWeeks = document.querySelector("#goalWeeks");
+const goalMilestones = document.querySelector("#goalMilestones");
 const warmupForm = document.querySelector("#warmupForm");
 const raceStartTime = document.querySelector("#raceStartTime");
 const warmupType = document.querySelector("#warmupType");
@@ -25,6 +29,7 @@ const filterButtons = document.querySelectorAll(".filter");
 const copyPace = document.querySelector("#copyPace");
 const sharePace = document.querySelector("#sharePace");
 const copyPlan = document.querySelector("#copyPlan");
+const copyGoalLadder = document.querySelector("#copyGoalLadder");
 const copyWarmup = document.querySelector("#copyWarmup");
 const copyChecklist = document.querySelector("#copyChecklist");
 const resetChecklist = document.querySelector("#resetChecklist");
@@ -32,6 +37,7 @@ const copyTestEstimate = document.querySelector("#copyTestEstimate");
 const copyRaceReview = document.querySelector("#copyRaceReview");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
+const goalStatus = document.querySelector("#goalStatus");
 const warmupStatus = document.querySelector("#warmupStatus");
 const checklistStatus = document.querySelector("#checklistStatus");
 const testStatus = document.querySelector("#testStatus");
@@ -56,6 +62,9 @@ const fields = {
   zoneEndurance: document.querySelector("#zoneEndurance"),
   zoneTempo: document.querySelector("#zoneTempo"),
   zoneEasy: document.querySelector("#zoneEasy"),
+  goalGap: document.querySelector("#goalGap"),
+  weeklyGain: document.querySelector("#weeklyGain"),
+  goalAdvice: document.querySelector("#goalAdvice"),
   checklistProgress: document.querySelector("#checklistProgress"),
   checklistNext: document.querySelector("#checklistNext"),
   estimated800: document.querySelector("#estimated800"),
@@ -242,6 +251,8 @@ function buildSettingsUrl() {
   url.searchParams.set("nivel", athleteLevel.value);
   url.searchParams.set("perioada", seasonPhase.value);
   url.searchParams.set("sedinte", sessionsPerWeek.value);
+  url.searchParams.set("actual", currentSeasonTime.value.trim());
+  url.searchParams.set("sapt", goalWeeks.value);
   url.searchParams.set("start", raceStartTime.value);
   url.searchParams.set("incalzire", warmupType.value);
   url.searchParams.set("test", testType.value);
@@ -267,6 +278,8 @@ function restoreFromUrl() {
     athleteLevel: params.get("nivel"),
     seasonPhase: params.get("perioada"),
     sessionsPerWeek: params.get("sedinte"),
+    currentSeasonTime: params.get("actual"),
+    goalWeeks: params.get("sapt"),
     raceStartTime: params.get("start"),
     warmupType: params.get("incalzire"),
     testType: params.get("test"),
@@ -282,6 +295,8 @@ function restoreFromUrl() {
   if ([...athleteLevel.options].some((option) => option.value === values.athleteLevel)) athleteLevel.value = values.athleteLevel;
   if ([...seasonPhase.options].some((option) => option.value === values.seasonPhase)) seasonPhase.value = values.seasonPhase;
   if (values.sessionsPerWeek) sessionsPerWeek.value = values.sessionsPerWeek;
+  if (values.currentSeasonTime) currentSeasonTime.value = values.currentSeasonTime;
+  if (values.goalWeeks) goalWeeks.value = values.goalWeeks;
   if (/^\d{2}:\d{2}$/.test(values.raceStartTime || "")) raceStartTime.value = values.raceStartTime;
   if ([...warmupType.options].some((option) => option.value === values.warmupType)) warmupType.value = values.warmupType;
   if ([...testType.options].some((option) => option.value === values.testType)) testType.value = values.testType;
@@ -733,6 +748,67 @@ function raceReviewSummary() {
   ].join("\n");
 }
 
+function goalAdviceFor(gap, weeklyGain) {
+  if (gap <= 0) return "Tinta este deja atinsa sau mai lenta decat timpul actual. Alege o tinta mai ambitioasa sau foloseste scara pentru mentinere.";
+  if (weeklyGain <= 0.35) return "Obiectiv conservator: prioritizeaza continuitatea, tehnica si evitarea accidentarilor.";
+  if (weeklyGain <= 0.9) return "Obiectiv realizabil daca progresul vine din consistenta, nu din sedinte fortate.";
+  if (weeklyGain <= 1.4) return "Obiectiv ambitios: cere recuperare buna, teste rare si ajustare daca oboseala se acumuleaza.";
+  return "Obiectiv foarte agresiv: trateaza-l ca reper motivational si seteaza o tinta intermediara mai sigura.";
+}
+
+function updateGoalLadder() {
+  const current = parseTime(currentSeasonTime.value);
+  const target = parseTime(targetTime.value);
+  const weeks = Math.max(4, Math.min(24, Number(goalWeeks.value) || 12));
+  goalWeeks.value = weeks;
+
+  if (!current || !target || current < 60 || current > 420 || target < 60 || target > 360) {
+    currentSeasonTime.setAttribute("aria-invalid", "true");
+    fields.goalGap.textContent = "--";
+    fields.weeklyGain.textContent = "verifica datele";
+    fields.goalAdvice.textContent = "Introdu un timp actual realist si o tinta valida in calculator.";
+    goalMilestones.innerHTML = "";
+    syncUrlState();
+    return;
+  }
+
+  currentSeasonTime.removeAttribute("aria-invalid");
+  const gap = current - target;
+  const weeklyGain = gap / weeks;
+  fields.goalGap.textContent = gap > 0 ? `${gap.toFixed(1)}s` : `+${Math.abs(gap).toFixed(1)}s fata de tinta`;
+  fields.weeklyGain.textContent = gap > 0 ? `${weeklyGain.toFixed(2)}s/sapt.` : "mentinere";
+  fields.goalAdvice.textContent = goalAdviceFor(gap, weeklyGain);
+
+  const checkpoints = [0.25, 0.5, 0.75, 1].map((portion) => {
+    const week = Math.max(1, Math.round(weeks * portion));
+    const checkpointTime = current - gap * portion;
+    return { week, checkpointTime };
+  });
+
+  goalMilestones.innerHTML = checkpoints.map(({ week, checkpointTime }) => `
+    <div><strong>Sapt. ${week}:</strong><span>${formatTime(checkpointTime)}</span></div>
+  `).join("");
+  syncUrlState();
+}
+
+function goalLadderSummary() {
+  const milestones = [...goalMilestones.querySelectorAll("div")].map((item) => {
+    const week = item.querySelector("strong").textContent;
+    const time = item.querySelector("span").textContent;
+    return `${week}: ${time}`;
+  });
+  return [
+    "Scara obiectivului 800 m",
+    `Timp actual: ${currentSeasonTime.value}`,
+    `Tinta: ${targetTime.value}`,
+    `Saptamani: ${goalWeeks.value}`,
+    `Diferenta: ${fields.goalGap.textContent}`,
+    `Ritm progres: ${fields.weeklyGain.textContent}`,
+    `Evaluare: ${fields.goalAdvice.textContent}`,
+    ...milestones
+  ].join("\n");
+}
+
 function updatePlan() {
   const level = athleteLevel.value;
   const phase = seasonPhase.value;
@@ -780,11 +856,14 @@ form.addEventListener("submit", (event) => {
 
 targetTime.addEventListener("input", enableUrlSync(updateCalculator));
 targetTime.addEventListener("input", enableUrlSync(updateRaceReview));
+targetTime.addEventListener("input", enableUrlSync(updateGoalLadder));
 raceProfile.addEventListener("change", enableUrlSync(updateCalculator));
 trainingFocus.addEventListener("change", enableUrlSync(updateCalculator));
 standardGender.addEventListener("change", enableUrlSync(updateCalculator));
 plannerForm.addEventListener("input", enableUrlSync(updatePlan));
 plannerForm.addEventListener("change", enableUrlSync(updatePlan));
+goalLadderForm.addEventListener("input", enableUrlSync(updateGoalLadder));
+goalLadderForm.addEventListener("change", enableUrlSync(updateGoalLadder));
 warmupForm.addEventListener("input", enableUrlSync(updateWarmup));
 warmupForm.addEventListener("change", enableUrlSync(updateWarmup));
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
@@ -794,6 +873,7 @@ raceReviewForm.addEventListener("change", enableUrlSync(updateRaceReview));
 copyPace.addEventListener("click", () => copyText(paceSummary(), paceStatus, "Rezultatul a fost copiat."));
 sharePace.addEventListener("click", () => copyText(buildSettingsUrl().toString(), paceStatus, "Linkul cu setarile a fost copiat."));
 copyPlan.addEventListener("click", () => copyText(planSummary(), planStatus, "Planul saptamanal a fost copiat."));
+copyGoalLadder.addEventListener("click", () => copyText(goalLadderSummary(), goalStatus, "Scara obiectivului a fost copiata."));
 copyWarmup.addEventListener("click", () => copyText(warmupSummary(), warmupStatus, "Incalzirea a fost copiata."));
 copyChecklist.addEventListener("click", () => copyText(checklistSummary(), checklistStatus, "Checklistul a fost copiat."));
 resetChecklist.addEventListener("click", resetChecklistState);
@@ -818,6 +898,7 @@ filterButtons.forEach((button) => {
 restoreFromUrl();
 updateCalculator();
 updatePlan();
+updateGoalLadder();
 updateWarmup();
 renderChecklist();
 updateTestEstimate();

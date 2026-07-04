@@ -266,8 +266,10 @@ h3 {
 .checklist-items,
 .test-predictor-grid,
 .race-review-grid,
+.goal-ladder-grid,
 .test-estimate,
 .race-review-results,
+.goal-ladder-results,
 .timeline,
 .workout-grid,
 .cards-three,
@@ -294,6 +296,8 @@ h3 {
 .checklist-item,
 .test-estimate article,
 .race-review-results article,
+.goal-ladder-results article,
+.goal-milestones,
 .timeline article,
 .workout,
 .cards-three article,
@@ -321,6 +325,7 @@ h3 {
 .checklist-progress span,
 .test-estimate span,
 .race-review-results span,
+.goal-ladder-results span,
 .workout-meta,
 .quick-tools span {
   color: var(--muted);
@@ -769,13 +774,25 @@ input[aria-invalid="true"] {
   align-items: stretch;
 }
 
+.goal-ladder-grid {
+  grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
 .test-estimate,
-.race-review-results {
+.race-review-results,
+.goal-ladder-results {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.goal-ladder-results .goal-milestones {
+  grid-column: 1 / -1;
+}
+
 .test-estimate article,
-.race-review-results article {
+.race-review-results article,
+.goal-ladder-results article {
   display: grid;
   gap: 10px;
   align-content: start;
@@ -783,24 +800,55 @@ input[aria-invalid="true"] {
 }
 
 .test-estimate strong,
-.race-review-results strong {
+.race-review-results strong,
+.goal-ladder-results strong {
   color: var(--track-dark);
   font-size: clamp(30px, 4vw, 48px);
   line-height: 1;
 }
 
-#lapBalance {
+#lapBalance,
+#weeklyGain {
   font-size: clamp(26px, 3vw, 38px);
 }
 
 .test-estimate p,
-.race-review-results p {
+.race-review-results p,
+.goal-ladder-results p {
   margin-bottom: 0;
   color: var(--muted);
 }
 
 .race-review-results article:last-child {
   grid-column: span 1;
+}
+
+.goal-milestones {
+  overflow: hidden;
+}
+
+.goal-milestones div {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 18px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.goal-milestones div:last-child {
+  border-bottom: 0;
+}
+
+.goal-milestones strong {
+  color: var(--accent-dark);
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.goal-milestones span {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 900;
 }
 
 .standards-table {
@@ -839,6 +887,7 @@ input[aria-invalid="true"] {
   .checklist-grid,
   .test-predictor-grid,
   .race-review-grid,
+  .goal-ladder-grid,
   .results {
     grid-template-columns: 1fr;
   }
@@ -855,6 +904,7 @@ input[aria-invalid="true"] {
   .checklist-items,
   .test-estimate,
   .race-review-results,
+  .goal-ladder-results,
   .workout-grid,
   .cards-three,
   .knowledge-grid {
@@ -894,6 +944,7 @@ input[aria-invalid="true"] {
   .checklist-items,
   .test-estimate,
   .race-review-results,
+  .goal-ladder-results,
   .workout-grid,
   .cards-three,
   .knowledge-grid,
@@ -902,7 +953,8 @@ input[aria-invalid="true"] {
   }
 
   .day-row,
-  .warmup-row {
+  .warmup-row,
+  .goal-milestones div {
     grid-template-columns: 1fr;
     gap: 6px;
   }

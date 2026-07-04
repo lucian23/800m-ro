@@ -216,6 +216,32 @@
           </form>
           <div class="week-plan" id="weekPlan" aria-live="polite"></div>
         </div>
+
+        <div class="section-subheading">
+          <h3>Scara obiectivului de sezon</h3>
+          <p>Introdu timpul actual si numarul de saptamani pana la cursa importanta. Instrumentul transforma tinta din calculator in repere intermediare realiste.</p>
+        </div>
+        <div class="goal-ladder-grid">
+          <form class="planner-form" id="goalLadderForm">
+            <label>
+              Timp actual 800 m
+              <input id="currentSeasonTime" type="text" inputmode="decimal" value="2:08.00" aria-describedby="goalHelp">
+            </label>
+            <label>
+              Saptamani pana la obiectiv
+              <input id="goalWeeks" type="number" min="4" max="24" value="12">
+            </label>
+            <p id="goalHelp" class="hint">Tinta finala este timpul din calculatorul principal. Foloseste 4-24 saptamani pentru o progresie orientativa.</p>
+            <button class="button secondary" id="copyGoalLadder" type="button">Copiaza scara</button>
+            <p class="status-message" id="goalStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="goal-ladder-results" aria-live="polite">
+            <article><span>Diferenta de recuperat</span><strong id="goalGap">10.0s</strong></article>
+            <article><span>Ritm de progres</span><strong id="weeklyGain">0.83s/sapt.</strong></article>
+            <article><span>Evaluare</span><p id="goalAdvice">Obiectiv realizabil daca progresul vine din consistenta, nu din sedinte fortate.</p></article>
+            <div class="goal-milestones" id="goalMilestones"></div>
+          </div>
+        </div>
       </section>
 
       <section id="incalzire" class="section warmup-section">
@@ -400,6 +426,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-04">4 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=race-review-20260704"></script>
+    <script src="app.js?v=goal-ladder-20260704"></script>
   </body>
 </html>

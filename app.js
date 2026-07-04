@@ -17,6 +17,9 @@ const workoutGrid = document.querySelector("#workoutGrid");
 const testPredictorForm = document.querySelector("#testPredictorForm");
 const testType = document.querySelector("#testType");
 const testTime = document.querySelector("#testTime");
+const raceReviewForm = document.querySelector("#raceReviewForm");
+const actualResult = document.querySelector("#actualResult");
+const raceSplit400 = document.querySelector("#raceSplit400");
 const personalStrategy = document.querySelector("#personalStrategy");
 const filterButtons = document.querySelectorAll(".filter");
 const copyPace = document.querySelector("#copyPace");
@@ -26,11 +29,13 @@ const copyWarmup = document.querySelector("#copyWarmup");
 const copyChecklist = document.querySelector("#copyChecklist");
 const resetChecklist = document.querySelector("#resetChecklist");
 const copyTestEstimate = document.querySelector("#copyTestEstimate");
+const copyRaceReview = document.querySelector("#copyRaceReview");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const warmupStatus = document.querySelector("#warmupStatus");
 const checklistStatus = document.querySelector("#checklistStatus");
 const testStatus = document.querySelector("#testStatus");
+const raceReviewStatus = document.querySelector("#raceReviewStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
@@ -55,7 +60,10 @@ const fields = {
   checklistNext: document.querySelector("#checklistNext"),
   estimated800: document.querySelector("#estimated800"),
   estimateConfidence: document.querySelector("#estimateConfidence"),
-  estimateAdvice: document.querySelector("#estimateAdvice")
+  estimateAdvice: document.querySelector("#estimateAdvice"),
+  raceDelta: document.querySelector("#raceDelta"),
+  lapBalance: document.querySelector("#lapBalance"),
+  raceReviewAdvice: document.querySelector("#raceReviewAdvice")
 };
 
 const workouts = [
@@ -238,6 +246,8 @@ function buildSettingsUrl() {
   url.searchParams.set("incalzire", warmupType.value);
   url.searchParams.set("test", testType.value);
   url.searchParams.set("testt", testTime.value.trim());
+  url.searchParams.set("rezultat", actualResult.value.trim());
+  url.searchParams.set("s400", raceSplit400.value.trim());
   url.hash = window.location.hash || "calculator";
   return url;
 }
@@ -260,7 +270,9 @@ function restoreFromUrl() {
     raceStartTime: params.get("start"),
     warmupType: params.get("incalzire"),
     testType: params.get("test"),
-    testTime: params.get("testt")
+    testTime: params.get("testt"),
+    actualResult: params.get("rezultat"),
+    raceSplit400: params.get("s400")
   };
 
   if (values.targetTime) targetTime.value = values.targetTime;
@@ -274,6 +286,8 @@ function restoreFromUrl() {
   if ([...warmupType.options].some((option) => option.value === values.warmupType)) warmupType.value = values.warmupType;
   if ([...testType.options].some((option) => option.value === values.testType)) testType.value = values.testType;
   if (values.testTime) testTime.value = values.testTime;
+  if (values.actualResult) actualResult.value = values.actualResult;
+  if (values.raceSplit400) raceSplit400.value = values.raceSplit400;
 }
 
 function splitPlan(totalSeconds, profile) {
@@ -648,6 +662,77 @@ function testEstimateSummary() {
   ].join("\n");
 }
 
+function signedSeconds(value) {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${value.toFixed(1)}s`;
+}
+
+function raceReviewAdvice(delta, balance) {
+  const resultPart = delta <= -0.2
+    ? "Ai alergat sub tinta; pastreaza structura si cauta ajustari mici, nu schimbari radicale."
+    : delta <= 0.5
+      ? "Ai fost practic pe tinta; prioritatea este repetabilitatea si executia sub presiune."
+      : delta <= 2.5
+        ? "Ai fost aproape de tinta; cauta 1-2 secunde prin pacing mai curat si final mai devreme pregatit."
+        : "Tinta a fost peste forma zilei; recalibreaza obiectivul sau construieste inca 2-3 saptamani de specific.";
+
+  const pacingPart = balance > 5
+    ? "Turul doi a cazut mult: primul 400 m a fost probabil prea agresiv pentru ziua respectiva."
+    : balance > 2
+      ? "Pacing usor pozitiv: acceptabil la 800 m, dar zona 500-700 m trebuie pregatita mai bine."
+      : balance < -1
+        ? "Finish progresiv: ai avut rezerve; poti testa o lansare mai ferma sau o mutare mai devreme."
+        : "Balans bun intre tururi: executia a fost controlata si usor de repetat.";
+
+  return `${resultPart} ${pacingPart}`;
+}
+
+function updateRaceReview() {
+  const target = parseTime(targetTime.value);
+  const actual = parseTime(actualResult.value);
+  const firstLap = parseTime(raceSplit400.value);
+
+  if (!target || !actual || !firstLap || actual < 60 || actual > 360 || firstLap < actual * 0.42 || firstLap > actual * 0.62) {
+    if (!actual || actual < 60 || actual > 360) {
+      actualResult.setAttribute("aria-invalid", "true");
+    } else {
+      actualResult.removeAttribute("aria-invalid");
+    }
+    if (!firstLap || !actual || firstLap < actual * 0.42 || firstLap > actual * 0.62) {
+      raceSplit400.setAttribute("aria-invalid", "true");
+    } else {
+      raceSplit400.removeAttribute("aria-invalid");
+    }
+    fields.raceDelta.textContent = "--";
+    fields.lapBalance.textContent = "verifica datele";
+    fields.raceReviewAdvice.textContent = "Introdu un rezultat final realist si un split de 400 m compatibil cu timpul total.";
+    syncUrlState();
+    return;
+  }
+
+  actualResult.removeAttribute("aria-invalid");
+  raceSplit400.removeAttribute("aria-invalid");
+  const secondLap = actual - firstLap;
+  const delta = actual - target;
+  const balance = secondLap - firstLap;
+  fields.raceDelta.textContent = signedSeconds(delta);
+  fields.lapBalance.textContent = `${formatTime(firstLap)} / ${formatTime(secondLap)} (${signedSeconds(balance)})`;
+  fields.raceReviewAdvice.textContent = raceReviewAdvice(delta, balance);
+  syncUrlState();
+}
+
+function raceReviewSummary() {
+  return [
+    `Analiza cursa 800 m`,
+    `Tinta: ${targetTime.value}`,
+    `Rezultat: ${actualResult.value}`,
+    `Split 400 m: ${raceSplit400.value}`,
+    `Abatere: ${fields.raceDelta.textContent}`,
+    `Balans tururi: ${fields.lapBalance.textContent}`,
+    `Concluzie: ${fields.raceReviewAdvice.textContent}`
+  ].join("\n");
+}
+
 function updatePlan() {
   const level = athleteLevel.value;
   const phase = seasonPhase.value;
@@ -694,6 +779,7 @@ form.addEventListener("submit", (event) => {
 });
 
 targetTime.addEventListener("input", enableUrlSync(updateCalculator));
+targetTime.addEventListener("input", enableUrlSync(updateRaceReview));
 raceProfile.addEventListener("change", enableUrlSync(updateCalculator));
 trainingFocus.addEventListener("change", enableUrlSync(updateCalculator));
 standardGender.addEventListener("change", enableUrlSync(updateCalculator));
@@ -703,6 +789,8 @@ warmupForm.addEventListener("input", enableUrlSync(updateWarmup));
 warmupForm.addEventListener("change", enableUrlSync(updateWarmup));
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
+raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
+raceReviewForm.addEventListener("change", enableUrlSync(updateRaceReview));
 copyPace.addEventListener("click", () => copyText(paceSummary(), paceStatus, "Rezultatul a fost copiat."));
 sharePace.addEventListener("click", () => copyText(buildSettingsUrl().toString(), paceStatus, "Linkul cu setarile a fost copiat."));
 copyPlan.addEventListener("click", () => copyText(planSummary(), planStatus, "Planul saptamanal a fost copiat."));
@@ -710,6 +798,7 @@ copyWarmup.addEventListener("click", () => copyText(warmupSummary(), warmupStatu
 copyChecklist.addEventListener("click", () => copyText(checklistSummary(), checklistStatus, "Checklistul a fost copiat."));
 resetChecklist.addEventListener("click", resetChecklistState);
 copyTestEstimate.addEventListener("click", () => copyText(testEstimateSummary(), testStatus, "Estimarea a fost copiata."));
+copyRaceReview.addEventListener("click", () => copyText(raceReviewSummary(), raceReviewStatus, "Analiza a fost copiata."));
 raceChecklist.addEventListener("change", (event) => {
   if (!event.target.matches("input[type='checkbox']")) return;
   const state = readChecklistState();
@@ -732,4 +821,5 @@ updatePlan();
 updateWarmup();
 renderChecklist();
 updateTestEstimate();
+updateRaceReview();
 renderWorkouts();

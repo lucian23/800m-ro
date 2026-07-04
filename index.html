@@ -321,7 +321,7 @@
               <select id="testType">
                 <option value="300">300 m lansat / rapid</option>
                 <option value="500">500 m controlat</option>
-                <option value="600">600 m test</option>
+                <option value="600" selected>600 m test</option>
                 <option value="1000">1000 m specific</option>
               </select>
             </label>
@@ -335,8 +335,33 @@
           </form>
           <div class="test-estimate" aria-live="polite">
             <article><span>Estimare 800 m</span><strong id="estimated800">2:02.4</strong></article>
-            <article><span>Incredere</span><strong id="estimateConfidence">medie</strong></article>
+            <article><span>Incredere</span><strong id="estimateConfidence">buna</strong></article>
             <article><span>Interpretare</span><p id="estimateAdvice">Compara estimarea cu spliturile si cu senzatia din ultimele 200 m.</p></article>
+          </div>
+        </div>
+
+        <div class="section-subheading">
+          <h3>Analiza dupa cursa</h3>
+          <p>Compara timpul tinta cu rezultatul real si cu splitul de la 400 m. Instrumentul arata abaterea, balansul dintre tururi si o concluzie practica pentru urmatoarea saptamana.</p>
+        </div>
+        <div class="race-review-grid">
+          <form class="planner-form" id="raceReviewForm">
+            <label>
+              Rezultat final 800 m
+              <input id="actualResult" type="text" inputmode="decimal" value="2:01.20" aria-describedby="reviewHelp">
+            </label>
+            <label>
+              Split 400 m
+              <input id="raceSplit400" type="text" inputmode="decimal" value="59.0">
+            </label>
+            <p id="reviewHelp" class="hint">Timpul tinta este preluat din calculatorul principal. Formate acceptate: 59.0, 1:01.2, 121.2.</p>
+            <button class="button secondary" id="copyRaceReview" type="button">Copiaza analiza</button>
+            <p class="status-message" id="raceReviewStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="race-review-results" aria-live="polite">
+            <article><span>Abatere fata de tinta</span><strong id="raceDelta">+3.2s</strong></article>
+            <article><span>Balans tururi</span><strong id="lapBalance">+3.2s</strong></article>
+            <article><span>Concluzie</span><p id="raceReviewAdvice">Primul tur a fost usor agresiv; prioritizeaza controlul 200-500 m.</p></article>
           </div>
         </div>
       </section>
@@ -375,6 +400,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-04">4 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=checklist-20260704"></script>
+    <script src="app.js?v=race-review-20260704"></script>
   </body>
 </html>

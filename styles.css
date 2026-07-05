@@ -796,7 +796,8 @@ input[aria-invalid="true"] {
 .recovery-plan-grid,
 .next-session-grid,
 .timeline-day-grid,
-.time-converter-grid {
+.time-converter-grid,
+.weight-impact-grid {
   grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
   gap: 24px;
   align-items: stretch;
@@ -828,6 +829,7 @@ input[aria-invalid="true"] {
 .next-session-results,
 .timeline-day-results,
 .time-converter-results,
+.weight-impact-results,
 .goal-ladder-results,
 .pacing-scenario-results,
 .load-monitor-results,
@@ -845,6 +847,7 @@ input[aria-invalid="true"] {
 .next-session-results article,
 .timeline-day-results article,
 .time-converter-results article,
+.weight-impact-results article,
 .goal-ladder-results article,
 .pacing-scenario-results article,
 .load-monitor-results article,
@@ -861,6 +864,7 @@ input[aria-invalid="true"] {
 .next-session-results strong,
 .timeline-day-results strong,
 .time-converter-results strong,
+.weight-impact-results strong,
 .goal-ladder-results strong,
 .pacing-scenario-results strong,
 .load-monitor-results strong,
@@ -884,6 +888,7 @@ input[aria-invalid="true"] {
 .next-session-results p,
 .timeline-day-results p,
 .time-converter-results p,
+.weight-impact-results p,
 .goal-ladder-results p,
 .pacing-scenario-results p,
 .load-monitor-results p,
@@ -899,7 +904,8 @@ input[aria-invalid="true"] {
 .recovery-plan-results .recovery-advice,
 .next-session-results .next-session-advice,
 .timeline-day-results .timeline-day-advice,
-.time-converter-results .converter-note {
+.time-converter-results .converter-note,
+.weight-impact-results .weight-impact-advice {
   grid-column: 1 / -1;
 }
 
@@ -1154,6 +1160,7 @@ input[aria-invalid="true"] {
   .next-session-results,
   .timeline-day-results,
   .time-converter-results,
+  .weight-impact-results,
   .goal-ladder-results,
   .pacing-scenario-results,
   .load-monitor-results,

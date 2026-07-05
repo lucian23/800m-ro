@@ -666,6 +666,31 @@
             <article><span>Volum tinta</span><strong id="nextSessionVolume">mediu</strong><p id="nextSessionVolumeText">Suficient pentru ritm, fara acumulare inutila.</p></article>
             <article class="next-session-advice"><span>Regula de siguranta</span><p id="nextSessionAdvice">Opreste sedinta daca tehnica scade sau picioarele raman grele la incalzire.</p></article>
           </div>
+
+        <div class="section-subheading">
+          <h3>Impactul greutatii asupra performantei</h3>
+          <p>Estimeaza cum se modifica timpul de 800 m in functie de greutatea corporala. Formula folosita: fiecare 1% diferenta de greutate influenteaza ~0.7% timpul pe semifond. Rezultatul este orientativ si nu inlocuieste evaluarea unui specialist.</p>
+        </div>
+        <div class="weight-impact-grid">
+          <form class="planner-form" id="weightImpactForm">
+            <label>
+              Greutate actuala (kg)
+              <input id="currentWeight" type="number" min="35" max="130" step="0.5" value="70">
+            </label>
+            <label>
+              Greutate tinta (kg)
+              <input id="targetWeight" type="number" min="35" max="130" step="0.5" value="68">
+            </label>
+            <p class="hint">Schimbarile de greutate trebuie facute gradual si sub supraveghere, fara restrictii drastice in perioada competitionala.</p>
+            <button class="button secondary" id="copyWeightImpact" type="button">Copiaza estimarea</button>
+            <p class="status-message" id="weightImpactStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="weight-impact-results" aria-live="polite">
+            <article><span>Diferenta de greutate</span><strong id="wiDelta">−2.0 kg</strong><p id="wiDeltaPct">−2.9%</p></article>
+            <article><span>Timp estimat la greutatea tinta</span><strong id="wiNewTime">1:55.8</strong><p id="wiTimeDelta">−1.7s</p></article>
+            <article class="weight-impact-advice"><span>Atentie</span><p id="wiAdvice">Pierderea in greutate nu trebuie sa sacrifice forta sau recuperarea.</p></article>
+          </div>
+        </div>
         </div>
       </section>
 
@@ -703,6 +728,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-05">5 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=pace-table-20260705"></script>
+    <script src="app.js?v=weight-impact-20260705"></script>
   </body>
 </html>

@@ -52,6 +52,9 @@ const morningMealStyle = document.querySelector("#morningMealStyle");
 const timeConverterForm = document.querySelector("#timeConverterForm");
 const converterDistance = document.querySelector("#converterDistance");
 const converterTime = document.querySelector("#converterTime");
+const weightImpactForm = document.querySelector("#weightImpactForm");
+const currentWeight = document.querySelector("#currentWeight");
+const targetWeight = document.querySelector("#targetWeight");
 const personalStrategy = document.querySelector("#personalStrategy");
 const pacingScenarioForm = document.querySelector("#pacingScenarioForm");
 const pacingScenarioType = document.querySelector("#pacingScenarioType");
@@ -76,6 +79,7 @@ const copyNextSession = document.querySelector("#copyNextSession");
 const copyTimelineDay = document.querySelector("#copyTimelineDay");
 const copyTimeConverter = document.querySelector("#copyTimeConverter");
 const copyPaceTable = document.querySelector("#copyPaceTable");
+const copyWeightImpact = document.querySelector("#copyWeightImpact");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const goalStatus = document.querySelector("#goalStatus");
@@ -92,6 +96,7 @@ const nextSessionStatus = document.querySelector("#nextSessionStatus");
 const timelineDayStatus = document.querySelector("#timelineDayStatus");
 const converterStatus = document.querySelector("#converterStatus");
 const paceTableStatus = document.querySelector("#paceTableStatus");
+const weightImpactStatus = document.querySelector("#weightImpactStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
@@ -164,6 +169,11 @@ const fields = {
   conv800: document.querySelector("#conv800"),
   conv1000: document.querySelector("#conv1000"),
   conv1500: document.querySelector("#conv1500"),
+  wiDelta: document.querySelector("#wiDelta"),
+  wiDeltaPct: document.querySelector("#wiDeltaPct"),
+  wiNewTime: document.querySelector("#wiNewTime"),
+  wiTimeDelta: document.querySelector("#wiTimeDelta"),
+  wiAdvice: document.querySelector("#wiAdvice"),
   scenarioFirstLap: document.querySelector("#scenarioFirstLap"),
   scenarioSecondLap: document.querySelector("#scenarioSecondLap"),
   scenarioBalance: document.querySelector("#scenarioBalance"),
@@ -845,6 +855,7 @@ function athleteSheetSummary() {
     `Urmatoarea sedinta: ${fields.nextSessionTitle.textContent} — ${fields.nextSessionDetails.textContent}`,
     `Timeline ziua cursei: trezire ${fields.tlWakeUp.textContent}, sosire ${fields.tlArrival.textContent}, start ${fields.tlStart.textContent}`,
     `Convertor distante: ${converterDistance.selectedOptions[0].textContent} ${converterTime.value} → 800 m ${fields.conv800?.textContent || "--"}`,
+    `Impact greutate: ${currentWeight.value} kg → ${targetWeight.value} kg, estimare ${fields.wiNewTime?.textContent || "--"}`,
     `Concluzie: ${fields.raceReviewAdvice.textContent}`
   ].join("\n");
 }
@@ -1349,6 +1360,55 @@ function timeConverterSummary() {
   ].join("\n");
 }
 
+function updateWeightImpact() {
+  const cw = clampNumber(currentWeight, 35, 130, 70);
+  const tw = clampNumber(targetWeight, 35, 130, 68);
+  const target = parseTime(targetTime.value);
+  const delta = tw - cw;
+  const deltaPct = cw > 0 ? (delta / cw) * 100 : 0;
+
+  fields.wiDelta.textContent = delta >= 0 ? `+${delta.toFixed(1)} kg` : `${delta.toFixed(1)} kg`;
+  fields.wiDeltaPct.textContent = delta >= 0 ? `+${deltaPct.toFixed(1)}%` : `${deltaPct.toFixed(1)}%`;
+
+  if (!target || target < 60 || target > 360) {
+    fields.wiNewTime.textContent = "--";
+    fields.wiTimeDelta.textContent = "introdu tinta in calculator";
+    fields.wiAdvice.textContent = "Timpul tinta din calculator este necesar pentru estimare.";
+    syncUrlState();
+    return;
+  }
+
+  const timeChangeFactor = deltaPct * 0.7 / 100;
+  const newTime = target * (1 + timeChangeFactor);
+  const timeDelta = newTime - target;
+
+  fields.wiNewTime.textContent = formatTime(newTime);
+  fields.wiTimeDelta.textContent = timeDelta >= 0 ? `+${timeDelta.toFixed(1)}s` : `${timeDelta.toFixed(1)}s`;
+
+  if (delta < -4) {
+    fields.wiAdvice.textContent = "Scaderea mare in greutate poate afecta forta si recuperarea. Schimbarile bruste nu sunt recomandate in sezon.";
+  } else if (delta < -1) {
+    fields.wiAdvice.textContent = "O scadere moderata, planificata in afara sezonului competitional, poate sustine performanta fara riscuri majore.";
+  } else if (delta > 1) {
+    fields.wiAdvice.textContent = "Cresterea in greutate poate fi benefica daca vine din masa musculara functionala (forta, trunchi, stabilitate).";
+  } else {
+    fields.wiAdvice.textContent = "Greutatea este aproape de tinta. Concentreaza-te pe compozitia corporala, nu pe cifra de pe cantar.";
+  }
+  syncUrlState();
+}
+
+function weightImpactSummary() {
+  return [
+    "Impact greutate asupra 800 m",
+    `Greutate actuala: ${currentWeight.value} kg`,
+    `Greutate tinta: ${targetWeight.value} kg`,
+    `Diferenta: ${fields.wiDelta.textContent} (${fields.wiDeltaPct.textContent})`,
+    `Timp estimat la greutatea tinta: ${fields.wiNewTime.textContent} (${fields.wiTimeDelta.textContent})`,
+    `Tinta 800 m: ${targetTime.value}`,
+    `Recomandare: ${fields.wiAdvice.textContent}`
+  ].join("\n");
+}
+
 function goalAdviceFor(gap, weeklyGain) {
   if (gap <= 0) return "Tinta este deja atinsa sau mai lenta decat timpul actual. Alege o tinta mai ambitioasa sau foloseste scara pentru mentinere.";
   if (weeklyGain <= 0.35) return "Obiectiv conservator: prioritizeaza continuitatea, tehnica si evitarea accidentarilor.";
@@ -1541,6 +1601,8 @@ wakeUpTime.addEventListener("change", enableUrlSync(updateTimelineDay));
 timeConverterForm.addEventListener("input", enableUrlSync(updateTimeConverter));
 timeConverterForm.addEventListener("change", enableUrlSync(updateTimeConverter));
 converterTime.addEventListener("input", enableUrlSync(updateTimeConverter));
+weightImpactForm.addEventListener("input", enableUrlSync(updateWeightImpact));
+weightImpactForm.addEventListener("change", enableUrlSync(updateWeightImpact));
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -1581,6 +1643,7 @@ copyNextSession.addEventListener("click", () => copyText(nextSessionSummary(), n
 copyTimelineDay.addEventListener("click", () => copyText(timelineDaySummary(), timelineDayStatus, "Timeline-ul a fost copiat."));
 copyTimeConverter.addEventListener("click", () => copyText(timeConverterSummary(), converterStatus, "Conversia a fost copiata."));
 copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceTableStatus, "Tabelul de ritmuri a fost copiat."));
+copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
 raceChecklist.addEventListener("change", (event) => {
   if (!event.target.matches("input[type='checkbox']")) return;
   const state = readChecklistState();
@@ -1607,6 +1670,7 @@ updateWarmup();
 updateFuelPlan();
 updateTimelineDay();
 updateTimeConverter();
+updateWeightImpact();
 updatePacingScenario();
 renderChecklist();
 updateTestEstimate();

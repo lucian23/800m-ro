@@ -219,6 +219,21 @@
             <article><span>1000 m</span><strong id="conv1000">2:39.5</strong><p>Sprijin aerob specific.</p></article>
             <article class="converter-note"><span>1500 m</span><strong id="conv1500">4:05.2</strong><p>Rezistenta generala.</p></article>
           </div>
+
+        <div class="section-subheading">
+          <h3>Tabel de ritmuri de antrenament</h3>
+          <p>Pe baza timpului tinta de 800 m din calculator, tabelul afiseaza ritmurile de alergare pentru fiecare zona. Fiecare reper este orientativ si trebuie ajustat dupa forma zilei, suprafata si conditii.</p>
+        </div>
+        <div class="pace-table-section" id="paceTableSection" aria-live="polite">
+          <table class="pace-table" aria-label="Ritmuri de antrenament">
+            <thead><tr><th>Zona</th><th>Distanta / reper</th><th>Timp tinta</th><th>Observatie</th></tr></thead>
+            <tbody id="paceTableBody"></tbody>
+          </table>
+          <div class="tool-actions" style="margin-top:14px">
+            <button class="button secondary small" id="copyPaceTable" type="button">Copiaza tabelul</button>
+            <p class="status-message" id="paceTableStatus" role="status" aria-live="polite"></p>
+          </div>
+        </div>
         </div>
       </section>
 
@@ -688,6 +703,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-05">5 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=time-converter-20260705"></script>
+    <script src="app.js?v=pace-table-20260705"></script>
   </body>
 </html>

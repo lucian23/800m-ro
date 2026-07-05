@@ -75,6 +75,7 @@ const copyRecoveryPlan = document.querySelector("#copyRecoveryPlan");
 const copyNextSession = document.querySelector("#copyNextSession");
 const copyTimelineDay = document.querySelector("#copyTimelineDay");
 const copyTimeConverter = document.querySelector("#copyTimeConverter");
+const copyPaceTable = document.querySelector("#copyPaceTable");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const goalStatus = document.querySelector("#goalStatus");
@@ -90,6 +91,7 @@ const recoveryStatus = document.querySelector("#recoveryStatus");
 const nextSessionStatus = document.querySelector("#nextSessionStatus");
 const timelineDayStatus = document.querySelector("#timelineDayStatus");
 const converterStatus = document.querySelector("#converterStatus");
+const paceTableStatus = document.querySelector("#paceTableStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
@@ -648,6 +650,7 @@ function updateCalculator() {
   fields.zoneEasy.textContent = zones.easy;
 
   renderStrategy(cumulative, raceProfile.value);
+  renderPaceTable(total);
 
   syncUrlState();
 }
@@ -1295,6 +1298,46 @@ function updateTimeConverter() {
   syncUrlState();
 }
 
+function paceTableData(totalSeconds) {
+  const p200 = totalSeconds / 4;
+  const easyMinKm = Math.round(totalSeconds * 2.15);
+  const tempoMinKm = Math.round(totalSeconds * 1.72);
+  return [
+    { zone: "Aerob usor", dist: "1 km", time: formatTime(Math.max(210, easyMinKm), 0) + " / km", note: "Conversatie posibila, puls sub 75% max." },
+    { zone: "Tempo", dist: "1 km", time: formatTime(Math.max(180, tempoMinKm), 0) + " / km", note: "Control metabolic; poti vorbi in fraze scurte." },
+    { zone: "Prag / threshold", dist: "1000 m", time: formatTime(totalSeconds * 1.40), note: "Sustinut, dar fara acumulare rapida de lactat." },
+    { zone: "VO2max", dist: "1000 m", time: formatTime(totalSeconds * 1.29), note: "Ritm ridicat; se foloseste rar, in intervale." },
+    { zone: "Specific 800 m", dist: "200 m", time: formatTime(p200), note: "Ritm de cursa; toate repetarile egale." },
+    { zone: "Specific 800 m", dist: "300 m", time: formatTime(p200 * 1.5), note: "Ritm de cursa; pauza 4-6 min." },
+    { zone: "Specific 800 m", dist: "400 m", time: formatTime(p200 * 2.03), note: "Primul tur orientativ; fara fortare." },
+    { zone: "Rezistenta specifica", dist: "500 m", time: formatTime(p200 * 2.5 + 2.0), note: "Controlat; pauza mare, maxim 2-3 repetari." },
+    { zone: "Rezistenta specifica", dist: "600 m", time: formatTime(totalSeconds * 0.725), note: "Aproape de cursa; uz rar, doar in forma buna." },
+    { zone: "Viteza", dist: "150 m", time: formatTime(p200 * 0.74) + " – " + formatTime(p200 * 0.78), note: "Relaxare, postura, recuperare completa." },
+    { zone: "Viteza", dist: "60-80 m", time: "progresiv", note: "Accelerari line, fara sprint fortat." },
+  ];
+}
+
+function renderPaceTable(totalSeconds) {
+  if (!totalSeconds || totalSeconds < 60 || totalSeconds > 360) {
+    document.querySelector("#paceTableBody").innerHTML = '<tr><td colspan="4">Introdu un timp tinta valid in calculator.</td></tr>';
+    return;
+  }
+  const rows = paceTableData(totalSeconds);
+  document.querySelector("#paceTableBody").innerHTML = rows.map(r =>
+    `<tr><td><strong>${r.zone}</strong></td><td>${r.dist}</td><td><strong>${r.time}</strong></td><td>${r.note}</td></tr>`
+  ).join("");
+}
+
+function paceTableSummary() {
+  const total = parseTime(targetTime.value);
+  if (!total) return "Introdu un timp tinta in calculator.";
+  const rows = paceTableData(total);
+  return [
+    `Tabel ritmuri antrenament — tinta 800 m: ${targetTime.value}`,
+    ...rows.map(r => `${r.zone} | ${r.dist}: ${r.time} — ${r.note}`)
+  ].join("\n");
+}
+
 function timeConverterSummary() {
   const lines = [];
   Object.keys(converterFactors()).forEach(d => {
@@ -1537,6 +1580,7 @@ copyRecoveryPlan.addEventListener("click", () => copyText(recoveryPlanSummary(),
 copyNextSession.addEventListener("click", () => copyText(nextSessionSummary(), nextSessionStatus, "Sedinta urmatoare a fost copiata."));
 copyTimelineDay.addEventListener("click", () => copyText(timelineDaySummary(), timelineDayStatus, "Timeline-ul a fost copiat."));
 copyTimeConverter.addEventListener("click", () => copyText(timeConverterSummary(), converterStatus, "Conversia a fost copiata."));
+copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceTableStatus, "Tabelul de ritmuri a fost copiat."));
 raceChecklist.addEventListener("change", (event) => {
   if (!event.target.matches("input[type='checkbox']")) return;
   const state = readChecklistState();

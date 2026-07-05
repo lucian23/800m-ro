@@ -1029,6 +1029,52 @@ input[aria-invalid="true"] {
   background: var(--ink);
 }
 
+.pace-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+}
+
+.pace-table th {
+  padding: 12px 16px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pace-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.pace-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.pace-table td strong {
+  color: var(--track-dark);
+  font-size: 16px;
+}
+
+.pace-table tr:nth-child(even) td {
+  background: rgba(0,0,0,0.015);
+}
+
+@media (max-width: 720px) {
+  .pace-table {
+    font-size: 13px;
+  }
+  .pace-table th,
+  .pace-table td {
+    padding: 10px 8px;
+  }
+}
+
 @media (max-width: 1080px) {
   .hero,
   .tool-grid,

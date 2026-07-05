@@ -691,6 +691,41 @@
             <article class="weight-impact-advice"><span>Atentie</span><p id="wiAdvice">Pierderea in greutate nu trebuie sa sacrifice forta sau recuperarea.</p></article>
           </div>
         </div>
+
+        <div class="section-subheading">
+          <h3>Analizor de splituri reale</h3>
+          <p>Introdu spliturile tale reale de la 200 m, 400 m, 600 m si 800 m dintr-o cursa. Instrumentul le compara cu spliturile ideale din calculator si evidentiaza diferentele pe fiecare segment.</p>
+        </div>
+        <div class="split-analyzer-grid">
+          <form class="planner-form" id="splitAnalyzerForm">
+            <label>
+              Split real 200 m
+              <input id="saSplit200" type="text" inputmode="decimal" value="29.5" aria-describedby="saHelp">
+            </label>
+            <label>
+              Split real 400 m
+              <input id="saSplit400" type="text" inputmode="decimal" value="59.0">
+            </label>
+            <label>
+              Split real 600 m
+              <input id="saSplit600" type="text" inputmode="decimal" value="1:29.0">
+            </label>
+            <label>
+              Rezultat final 800 m
+              <input id="saSplit800" type="text" inputmode="decimal" value="1:59.0">
+            </label>
+            <p id="saHelp" class="hint">Timpul tinta si spliturile ideale sunt preluate din calculatorul principal.</p>
+            <button class="button secondary" id="copySplitAnalyzer" type="button">Copiaza analiza</button>
+            <p class="status-message" id="splitAnalyzerStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="split-analyzer-results" aria-live="polite">
+            <article><span>Timp total</span><strong id="saTotalTime">1:59.0</strong><p id="saTotalNote">cu 1.0s peste tinta</p></article>
+            <article><span>Segment 0-200 m</span><strong id="saSeg200">+0.2s</strong><p id="saSeg200Note">Plecare usor sub tinta.</p></article>
+            <article><span>Segment 200-400 m</span><strong id="saSeg400">+0.3s</strong><p id="saSeg400Note">Turul unu controlat.</p></article>
+            <article><span>Segment 400-600 m</span><strong id="saSeg600">+0.3s</strong><p id="saSeg600Note">Zona cheie mentinuta.</p></article>
+            <article class="split-analyzer-advice"><span>Segment 600-800 m</span><strong id="saSeg800">+0.2s</strong><p id="saSeg800Note">Finish pe tinta.</p></article>
+          </div>
+        </div>
         </div>
       </section>
 
@@ -728,6 +763,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-05">5 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=weight-impact-20260705"></script>
+    <script src="app.js?v=split-analyzer-20260705"></script>
   </body>
 </html>

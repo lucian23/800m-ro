@@ -55,6 +55,11 @@ const converterTime = document.querySelector("#converterTime");
 const weightImpactForm = document.querySelector("#weightImpactForm");
 const currentWeight = document.querySelector("#currentWeight");
 const targetWeight = document.querySelector("#targetWeight");
+const splitAnalyzerForm = document.querySelector("#splitAnalyzerForm");
+const saSplit200 = document.querySelector("#saSplit200");
+const saSplit400 = document.querySelector("#saSplit400");
+const saSplit600 = document.querySelector("#saSplit600");
+const saSplit800 = document.querySelector("#saSplit800");
 const personalStrategy = document.querySelector("#personalStrategy");
 const pacingScenarioForm = document.querySelector("#pacingScenarioForm");
 const pacingScenarioType = document.querySelector("#pacingScenarioType");
@@ -80,6 +85,7 @@ const copyTimelineDay = document.querySelector("#copyTimelineDay");
 const copyTimeConverter = document.querySelector("#copyTimeConverter");
 const copyPaceTable = document.querySelector("#copyPaceTable");
 const copyWeightImpact = document.querySelector("#copyWeightImpact");
+const copySplitAnalyzer = document.querySelector("#copySplitAnalyzer");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const goalStatus = document.querySelector("#goalStatus");
@@ -97,6 +103,7 @@ const timelineDayStatus = document.querySelector("#timelineDayStatus");
 const converterStatus = document.querySelector("#converterStatus");
 const paceTableStatus = document.querySelector("#paceTableStatus");
 const weightImpactStatus = document.querySelector("#weightImpactStatus");
+const splitAnalyzerStatus = document.querySelector("#splitAnalyzerStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
@@ -174,6 +181,16 @@ const fields = {
   wiNewTime: document.querySelector("#wiNewTime"),
   wiTimeDelta: document.querySelector("#wiTimeDelta"),
   wiAdvice: document.querySelector("#wiAdvice"),
+  saTotalTime: document.querySelector("#saTotalTime"),
+  saTotalNote: document.querySelector("#saTotalNote"),
+  saSeg200: document.querySelector("#saSeg200"),
+  saSeg200Note: document.querySelector("#saSeg200Note"),
+  saSeg400: document.querySelector("#saSeg400"),
+  saSeg400Note: document.querySelector("#saSeg400Note"),
+  saSeg600: document.querySelector("#saSeg600"),
+  saSeg600Note: document.querySelector("#saSeg600Note"),
+  saSeg800: document.querySelector("#saSeg800"),
+  saSeg800Note: document.querySelector("#saSeg800Note"),
   scenarioFirstLap: document.querySelector("#scenarioFirstLap"),
   scenarioSecondLap: document.querySelector("#scenarioSecondLap"),
   scenarioBalance: document.querySelector("#scenarioBalance"),
@@ -856,6 +873,7 @@ function athleteSheetSummary() {
     `Timeline ziua cursei: trezire ${fields.tlWakeUp.textContent}, sosire ${fields.tlArrival.textContent}, start ${fields.tlStart.textContent}`,
     `Convertor distante: ${converterDistance.selectedOptions[0].textContent} ${converterTime.value} → 800 m ${fields.conv800?.textContent || "--"}`,
     `Impact greutate: ${currentWeight.value} kg → ${targetWeight.value} kg, estimare ${fields.wiNewTime?.textContent || "--"}`,
+    `Analiza splituri: ${saSplit800.value || "--"} total, segmente ${fields.saSeg200?.textContent || "--"} / ${fields.saSeg400?.textContent || "--"} / ${fields.saSeg600?.textContent || "--"} / ${fields.saSeg800?.textContent || "--"}`,
     `Concluzie: ${fields.raceReviewAdvice.textContent}`
   ].join("\n");
 }
@@ -1397,6 +1415,86 @@ function updateWeightImpact() {
   syncUrlState();
 }
 
+function signedDiff(actual, ideal) {
+  const diff = actual - ideal;
+  return diff >= 0 ? `+${diff.toFixed(1)}s` : `${diff.toFixed(1)}s`;
+}
+
+function segmentNote(diff, segment) {
+  const abs = Math.abs(diff);
+  if (abs < 0.3) return `${segment} aproape de tinta.`;
+  if (diff > 1.5) return `${segment} prea lent: verifica daca ai fortat startul sau daca pozitia te-a incurcat.`;
+  if (diff > 0.5) return `${segment} usor peste tinta; urmareste sa nu pierzi contactul cu grupul.`;
+  if (diff < -1.0) return `${segment} semnificativ mai rapid: risc de cadere in turul doi.`;
+  if (diff < -0.3) return `${segment} usor sub tinta; ritm controlat, bun.`;
+  return `${segment} pe tinta.`;
+}
+
+function updateSplitAnalyzer() {
+  const target = parseTime(targetTime.value);
+  if (!target || target < 60 || target > 360) {
+    fields.saTotalTime.textContent = "--";
+    fields.saTotalNote.textContent = "introdu tinta in calculator";
+    ["200","400","600","800"].forEach(s => {
+      fields[`saSeg${s}`].textContent = "--";
+      fields[`saSeg${s}Note`].textContent = "tinta necesara";
+    });
+    syncUrlState();
+    return;
+  }
+
+  const ideal = splitPlan(target, raceProfile.value);
+  const idealCum = [ideal[0], ideal[0]+ideal[1], ideal[0]+ideal[1]+ideal[2], target];
+  const actual = [
+    parseTime(saSplit200.value),
+    parseTime(saSplit400.value),
+    parseTime(saSplit600.value),
+    parseTime(saSplit800.value)
+  ];
+
+  const segNames = ["0-200 m", "200-400 m", "400-600 m", "600-800 m"];
+  const segLabels = ["200","400","600","800"];
+
+  if (actual.some(a => !a)) {
+    fields.saTotalTime.textContent = "--";
+    fields.saTotalNote.textContent = "completeaza toate spliturile";
+    segLabels.forEach(s => {
+      fields[`saSeg${s}`].textContent = "--";
+      fields[`saSeg${s}Note`].textContent = "introdu splitul real";
+    });
+    syncUrlState();
+    return;
+  }
+
+  const totalDelta = actual[3] - target;
+  fields.saTotalTime.textContent = formatTime(actual[3]);
+  fields.saTotalNote.textContent = totalDelta >= 0
+    ? `cu ${totalDelta.toFixed(1)}s peste tinta`
+    : `cu ${Math.abs(totalDelta).toFixed(1)}s sub tinta`;
+
+  segLabels.forEach((s, i) => {
+    const idealAt = idealCum[i];
+    const actualAt = actual[i];
+    const diff = actualAt - idealAt;
+    fields[`saSeg${s}`].textContent = signedDiff(actualAt, idealAt);
+    fields[`saSeg${s}Note`].textContent = segmentNote(diff, segNames[i]);
+  });
+
+  syncUrlState();
+}
+
+function splitAnalyzerSummary() {
+  return [
+    "Analiza splituri reale 800 m",
+    `Tinta: ${targetTime.value}`,
+    `Rezultat: ${fields.saTotalTime.textContent} — ${fields.saTotalNote.textContent}`,
+    `200 m: ${fields.saSeg200.textContent} — ${fields.saSeg200Note.textContent}`,
+    `400 m: ${fields.saSeg400.textContent} — ${fields.saSeg400Note.textContent}`,
+    `600 m: ${fields.saSeg600.textContent} — ${fields.saSeg600Note.textContent}`,
+    `800 m: ${fields.saSeg800.textContent} — ${fields.saSeg800Note.textContent}`
+  ].join("\n");
+}
+
 function weightImpactSummary() {
   return [
     "Impact greutate asupra 800 m",
@@ -1603,6 +1701,8 @@ timeConverterForm.addEventListener("change", enableUrlSync(updateTimeConverter))
 converterTime.addEventListener("input", enableUrlSync(updateTimeConverter));
 weightImpactForm.addEventListener("input", enableUrlSync(updateWeightImpact));
 weightImpactForm.addEventListener("change", enableUrlSync(updateWeightImpact));
+splitAnalyzerForm.addEventListener("input", enableUrlSync(updateSplitAnalyzer));
+splitAnalyzerForm.addEventListener("change", enableUrlSync(updateSplitAnalyzer));
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -1644,6 +1744,7 @@ copyTimelineDay.addEventListener("click", () => copyText(timelineDaySummary(), t
 copyTimeConverter.addEventListener("click", () => copyText(timeConverterSummary(), converterStatus, "Conversia a fost copiata."));
 copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceTableStatus, "Tabelul de ritmuri a fost copiat."));
 copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
+copySplitAnalyzer.addEventListener("click", () => copyText(splitAnalyzerSummary(), splitAnalyzerStatus, "Analiza spliturilor a fost copiata."));
 raceChecklist.addEventListener("change", (event) => {
   if (!event.target.matches("input[type='checkbox']")) return;
   const state = readChecklistState();
@@ -1671,6 +1772,7 @@ updateFuelPlan();
 updateTimelineDay();
 updateTimeConverter();
 updateWeightImpact();
+updateSplitAnalyzer();
 updatePacingScenario();
 renderChecklist();
 updateTestEstimate();

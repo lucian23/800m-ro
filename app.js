@@ -1920,3 +1920,49 @@ updateRecoveryPlan();
 updateNextSession();
 renderAthleteSheet();
 renderWorkouts();
+
+/* Active nav highlight on scroll */
+const navLinks = document.querySelectorAll(".nav a");
+const sectionIds = [...navLinks].map((link) => link.getAttribute("href").replace("#", ""));
+const sections = sectionIds.map((id) => document.querySelector(`#${id}`)).filter(Boolean);
+
+function updateActiveNav() {
+  let activeSection = null;
+  const viewportTop = window.scrollY + 140; /* offset for sticky header */
+
+  for (const section of sections) {
+    if (section.offsetTop <= viewportTop) {
+      activeSection = section.id;
+    }
+  }
+
+  /* If scrolled to bottom, highlight last visible section */
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 120) {
+    const lastVisible = [...sections].reverse().find((s) => {
+      const rect = s.getBoundingClientRect();
+      return rect.top < window.innerHeight;
+    });
+    if (lastVisible) activeSection = lastVisible.id;
+  }
+
+  navLinks.forEach((link) => {
+    if (link.getAttribute("href") === `#${activeSection}`) {
+      link.classList.add("active");
+    } else {
+      link.classList.remove("active");
+    }
+  });
+}
+
+let scrollTicking = false;
+window.addEventListener("scroll", () => {
+  if (!scrollTicking) {
+    requestAnimationFrame(() => {
+      updateActiveNav();
+      scrollTicking = false;
+    });
+    scrollTicking = true;
+  }
+});
+
+updateActiveNav();

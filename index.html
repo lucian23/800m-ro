@@ -519,6 +519,39 @@
             <article><span>Concluzie</span><p id="raceReviewAdvice">Primul tur a fost usor agresiv; prioritizeaza controlul 200-500 m.</p></article>
           </div>
         </div>
+
+        <div class="section-subheading">
+          <h3>Plan de recuperare dupa cursa</h3>
+          <p>Transforma analiza de dupa cursa intr-un plan simplu pentru urmatoarele 72 de ore si pentru prima sedinta de calitate.</p>
+        </div>
+        <div class="recovery-plan-grid">
+          <form class="planner-form" id="recoveryPlanForm">
+            <label>
+              Oboseala musculara
+              <select id="sorenessLevel">
+                <option value="low">Scazuta</option>
+                <option value="medium" selected>Medie</option>
+                <option value="high">Ridicata</option>
+              </select>
+            </label>
+            <label>
+              Somn dupa cursa / noapte
+              <input id="postRaceSleep" type="number" min="4" max="10" step="0.25" value="7.5">
+            </label>
+            <label>
+              Zile pana la urmatorul concurs
+              <input id="nextRaceDays" type="number" min="1" max="28" value="7">
+            </label>
+            <button class="button secondary" id="copyRecoveryPlan" type="button">Copiaza recuperarea</button>
+            <p class="status-message" id="recoveryStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="recovery-plan-results" aria-live="polite">
+            <article><span>Primele 24 h</span><strong id="recoveryDay1">Revenire</strong><p id="recoveryDay1Text">Jogging usor sau mers, hidratare si masa completa.</p></article>
+            <article><span>48-72 h</span><strong id="recoveryDay2">Usor + mobilitate</strong><p id="recoveryDay2Text">Alergare usoara si cateva linii relaxate daca picioarele raspund bine.</p></article>
+            <article><span>Prima calitate</span><strong id="nextQualityDay">Ziua 4</strong><p id="nextQualityText">Ritm controlat, volum redus, fara test maxim.</p></article>
+            <article class="recovery-advice"><span>Atentie</span><p id="recoveryAdvice">Nu transforma revenirea in al doilea concurs.</p></article>
+          </div>
+        </div>
       </section>
 
       <section id="repere" class="section standards">
@@ -555,6 +588,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-04">4 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=fuel-plan-20260705"></script>
+    <script src="app.js?v=recovery-plan-20260705"></script>
   </body>
 </html>

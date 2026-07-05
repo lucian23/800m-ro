@@ -38,6 +38,10 @@ const testTime = document.querySelector("#testTime");
 const raceReviewForm = document.querySelector("#raceReviewForm");
 const actualResult = document.querySelector("#actualResult");
 const raceSplit400 = document.querySelector("#raceSplit400");
+const recoveryPlanForm = document.querySelector("#recoveryPlanForm");
+const sorenessLevel = document.querySelector("#sorenessLevel");
+const postRaceSleep = document.querySelector("#postRaceSleep");
+const nextRaceDays = document.querySelector("#nextRaceDays");
 const personalStrategy = document.querySelector("#personalStrategy");
 const pacingScenarioForm = document.querySelector("#pacingScenarioForm");
 const pacingScenarioType = document.querySelector("#pacingScenarioType");
@@ -57,6 +61,7 @@ const printAthleteSheet = document.querySelector("#printAthleteSheet");
 const copyPacingScenario = document.querySelector("#copyPacingScenario");
 const copyTestEstimate = document.querySelector("#copyTestEstimate");
 const copyRaceReview = document.querySelector("#copyRaceReview");
+const copyRecoveryPlan = document.querySelector("#copyRecoveryPlan");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const goalStatus = document.querySelector("#goalStatus");
@@ -68,6 +73,7 @@ const sheetStatus = document.querySelector("#sheetStatus");
 const pacingScenarioStatus = document.querySelector("#pacingScenarioStatus");
 const testStatus = document.querySelector("#testStatus");
 const raceReviewStatus = document.querySelector("#raceReviewStatus");
+const recoveryStatus = document.querySelector("#recoveryStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
@@ -110,6 +116,13 @@ const fields = {
   raceDelta: document.querySelector("#raceDelta"),
   lapBalance: document.querySelector("#lapBalance"),
   raceReviewAdvice: document.querySelector("#raceReviewAdvice"),
+  recoveryDay1: document.querySelector("#recoveryDay1"),
+  recoveryDay1Text: document.querySelector("#recoveryDay1Text"),
+  recoveryDay2: document.querySelector("#recoveryDay2"),
+  recoveryDay2Text: document.querySelector("#recoveryDay2Text"),
+  nextQualityDay: document.querySelector("#nextQualityDay"),
+  nextQualityText: document.querySelector("#nextQualityText"),
+  recoveryAdvice: document.querySelector("#recoveryAdvice"),
   scenarioFirstLap: document.querySelector("#scenarioFirstLap"),
   scenarioSecondLap: document.querySelector("#scenarioSecondLap"),
   scenarioBalance: document.querySelector("#scenarioBalance"),
@@ -309,6 +322,9 @@ function buildSettingsUrl() {
   url.searchParams.set("testt", testTime.value.trim());
   url.searchParams.set("rezultat", actualResult.value.trim());
   url.searchParams.set("s400", raceSplit400.value.trim());
+  url.searchParams.set("oboseala", sorenessLevel.value);
+  url.searchParams.set("somnpost", postRaceSleep.value);
+  url.searchParams.set("urmator", nextRaceDays.value);
   url.searchParams.set("sportiv", athleteName.value.trim());
   url.searchParams.set("concurs", competitionName.value.trim());
   url.searchParams.set("pacing", pacingScenarioType.value);
@@ -348,6 +364,9 @@ function restoreFromUrl() {
     testTime: params.get("testt"),
     actualResult: params.get("rezultat"),
     raceSplit400: params.get("s400"),
+    sorenessLevel: params.get("oboseala"),
+    postRaceSleep: params.get("somnpost"),
+    nextRaceDays: params.get("urmator"),
     athleteName: params.get("sportiv"),
     competitionName: params.get("concurs"),
     pacingScenarioType: params.get("pacing"),
@@ -377,6 +396,9 @@ function restoreFromUrl() {
   if (values.testTime) testTime.value = values.testTime;
   if (values.actualResult) actualResult.value = values.actualResult;
   if (values.raceSplit400) raceSplit400.value = values.raceSplit400;
+  if ([...sorenessLevel.options].some((option) => option.value === values.sorenessLevel)) sorenessLevel.value = values.sorenessLevel;
+  if (values.postRaceSleep) postRaceSleep.value = values.postRaceSleep;
+  if (values.nextRaceDays) nextRaceDays.value = values.nextRaceDays;
   if (values.athleteName) athleteName.value = values.athleteName;
   if (values.competitionName) competitionName.value = values.competitionName;
   if ([...pacingScenarioType.options].some((option) => option.value === values.pacingScenarioType)) pacingScenarioType.value = values.pacingScenarioType;
@@ -756,6 +778,7 @@ function athleteSheetSummary() {
     `Checklist: ${checkedCount}/${checklistItems.length} bifate`,
     `Pacing: primul 400 m ${fields.scenarioFirstLap.textContent}, turul doi ${fields.scenarioSecondLap.textContent}, balans ${fields.scenarioBalance.textContent}`,
     `Analiza cursa: ${fields.raceDelta.textContent}; ${fields.lapBalance.textContent}`,
+    `Recuperare: ${fields.recoveryDay1.textContent}, ${fields.recoveryDay2.textContent}, prima calitate ${fields.nextQualityDay.textContent}`,
     `Concluzie: ${fields.raceReviewAdvice.textContent}`
   ].join("\n");
 }
@@ -1001,6 +1024,50 @@ function raceReviewSummary() {
   ].join("\n");
 }
 
+function updateRecoveryPlan() {
+  const sleep = clampNumber(postRaceSleep, 4, 10, 7.5);
+  const days = clampNumber(nextRaceDays, 1, 28, 7);
+  const highStressRace = fields.raceDelta.textContent.startsWith("+") && parseFloat(fields.raceDelta.textContent) > 2.5;
+  const soreness = sorenessLevel.value;
+  let qualityDelay = soreness === "high" ? 5 : soreness === "medium" ? 4 : 3;
+
+  if (sleep < 6.5) qualityDelay += 1;
+  if (highStressRace) qualityDelay += 1;
+  if (days <= 4) qualityDelay = Math.min(qualityDelay, 3);
+
+  fields.recoveryDay1.textContent = soreness === "high" ? "Revenire pasiva" : "Revenire activa";
+  fields.recoveryDay1Text.textContent = soreness === "high"
+    ? "Mers, mobilitate usoara, hidratare si masa completa; evita alergarea daca pasul este rigid."
+    : "10-20 min foarte usor sau mers, mobilitate, hidratare si masa completa.";
+  fields.recoveryDay2.textContent = sleep < 6.5 ? "Somn + usor" : "Usor + mobilitate";
+  fields.recoveryDay2Text.textContent = sleep < 6.5
+    ? "Prioritizeaza somnul. Alergare scurta doar daca pulsul si picioarele sunt normale."
+    : "Alergare usoara si cateva linii relaxate daca picioarele raspund bine.";
+  fields.nextQualityDay.textContent = days <= 3 ? "Doar activare" : `Ziua ${qualityDelay}`;
+  fields.nextQualityText.textContent = days <= 3
+    ? "Urmatorul concurs este aproape: pastreaza doar activare scurta si prospetime."
+    : "Ritm controlat, volum redus, fara test maxim si fara repetari pana la epuizare.";
+  fields.recoveryAdvice.textContent = soreness === "high" || sleep < 6.5
+    ? "Semnele de oboseala sunt mari: urmatoarea sedinta grea trebuie castigata prin rabdare, nu fortata."
+    : highStressRace
+      ? "Cursa a fost solicitanta fata de tinta: recupereaza 48 h inainte de orice specific serios."
+      : "Nu transforma revenirea in al doilea concurs; calitatea revine cand picioarele sunt elastice.";
+  syncUrlState();
+}
+
+function recoveryPlanSummary() {
+  return [
+    "Plan recuperare dupa cursa 800 m",
+    `Oboseala musculara: ${sorenessLevel.selectedOptions[0].textContent}`,
+    `Somn dupa cursa: ${postRaceSleep.value} h/noapte`,
+    `Zile pana la urmatorul concurs: ${nextRaceDays.value}`,
+    `Primele 24 h: ${fields.recoveryDay1.textContent} — ${fields.recoveryDay1Text.textContent}`,
+    `48-72 h: ${fields.recoveryDay2.textContent} — ${fields.recoveryDay2Text.textContent}`,
+    `Prima calitate: ${fields.nextQualityDay.textContent} — ${fields.nextQualityText.textContent}`,
+    `Atentie: ${fields.recoveryAdvice.textContent}`
+  ].join("\n");
+}
+
 function goalAdviceFor(gap, weeklyGain) {
   if (gap <= 0) return "Tinta este deja atinsa sau mai lenta decat timpul actual. Alege o tinta mai ambitioasa sau foloseste scara pentru mentinere.";
   if (weeklyGain <= 0.35) return "Obiectiv conservator: prioritizeaza continuitatea, tehnica si evitarea accidentarilor.";
@@ -1167,6 +1234,7 @@ form.addEventListener("submit", (event) => {
 
 targetTime.addEventListener("input", enableUrlSync(updateCalculator));
 targetTime.addEventListener("input", enableUrlSync(updateRaceReview));
+targetTime.addEventListener("input", enableUrlSync(updateRecoveryPlan));
 targetTime.addEventListener("input", enableUrlSync(updateGoalLadder));
 targetTime.addEventListener("input", enableUrlSync(updatePacingScenario));
 raceStartTime.addEventListener("input", enableUrlSync(updateFuelPlan));
@@ -1187,7 +1255,11 @@ fuelPlanForm.addEventListener("change", enableUrlSync(updateFuelPlan));
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
+raceReviewForm.addEventListener("input", enableUrlSync(updateRecoveryPlan));
 raceReviewForm.addEventListener("change", enableUrlSync(updateRaceReview));
+raceReviewForm.addEventListener("change", enableUrlSync(updateRecoveryPlan));
+recoveryPlanForm.addEventListener("input", enableUrlSync(updateRecoveryPlan));
+recoveryPlanForm.addEventListener("change", enableUrlSync(updateRecoveryPlan));
 athleteSheetForm.addEventListener("input", enableUrlSync(renderAthleteSheet));
 athleteSheetForm.addEventListener("change", enableUrlSync(renderAthleteSheet));
 pacingScenarioForm.addEventListener("input", enableUrlSync(updatePacingScenario));
@@ -1209,6 +1281,7 @@ printAthleteSheet.addEventListener("click", printSheet);
 copyPacingScenario.addEventListener("click", () => copyText(pacingScenarioSummary(), pacingScenarioStatus, "Scenariul de pacing a fost copiat."));
 copyTestEstimate.addEventListener("click", () => copyText(testEstimateSummary(), testStatus, "Estimarea a fost copiata."));
 copyRaceReview.addEventListener("click", () => copyText(raceReviewSummary(), raceReviewStatus, "Analiza a fost copiata."));
+copyRecoveryPlan.addEventListener("click", () => copyText(recoveryPlanSummary(), recoveryStatus, "Planul de recuperare a fost copiat."));
 raceChecklist.addEventListener("change", (event) => {
   if (!event.target.matches("input[type='checkbox']")) return;
   const state = readChecklistState();
@@ -1237,5 +1310,6 @@ updatePacingScenario();
 renderChecklist();
 updateTestEstimate();
 updateRaceReview();
+updateRecoveryPlan();
 renderAthleteSheet();
 renderWorkouts();

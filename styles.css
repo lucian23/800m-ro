@@ -265,6 +265,7 @@ h3 {
 .checklist-grid,
 .checklist-items,
 .test-predictor-grid,
+.recovery-plan-grid,
 .race-review-grid,
 .pacing-scenario-grid,
 .load-monitor-grid,
@@ -273,6 +274,7 @@ h3 {
 .sheet-grid,
 .test-estimate,
 .race-review-results,
+.recovery-plan-results,
 .pacing-scenario-results,
 .load-monitor-results,
 .fuel-plan-results,
@@ -303,6 +305,7 @@ h3 {
 .checklist-item,
 .test-estimate article,
 .race-review-results article,
+.recovery-plan-results article,
 .pacing-scenario-results article,
 .load-monitor-results article,
 .goal-ladder-results article,
@@ -336,6 +339,7 @@ h3 {
 .checklist-progress span,
 .test-estimate span,
 .race-review-results span,
+.recovery-plan-results span,
 .pacing-scenario-results span,
 .load-monitor-results span,
 .fuel-plan-results span,
@@ -783,6 +787,12 @@ input[aria-invalid="true"] {
   align-items: stretch;
 }
 
+.recovery-plan-grid {
+  grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
 .race-review-grid {
   grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
   gap: 24px;
@@ -805,6 +815,7 @@ input[aria-invalid="true"] {
 
 .test-estimate,
 .race-review-results,
+.recovery-plan-results,
 .goal-ladder-results,
 .pacing-scenario-results,
 .load-monitor-results,
@@ -818,6 +829,7 @@ input[aria-invalid="true"] {
 
 .test-estimate article,
 .race-review-results article,
+.recovery-plan-results article,
 .goal-ladder-results article,
 .pacing-scenario-results article,
 .load-monitor-results article,
@@ -830,6 +842,7 @@ input[aria-invalid="true"] {
 
 .test-estimate strong,
 .race-review-results strong,
+.recovery-plan-results strong,
 .goal-ladder-results strong,
 .pacing-scenario-results strong,
 .load-monitor-results strong,
@@ -848,6 +861,7 @@ input[aria-invalid="true"] {
 
 .test-estimate p,
 .race-review-results p,
+.recovery-plan-results p,
 .goal-ladder-results p,
 .pacing-scenario-results p,
 .load-monitor-results p,
@@ -859,7 +873,8 @@ input[aria-invalid="true"] {
 .pacing-scenario-results .scenario-advice,
 .pacing-scenario-results .scenario-segments,
 .load-monitor-results .load-advice,
-.fuel-plan-results .fuel-advice {
+.fuel-plan-results .fuel-advice,
+.recovery-plan-results .recovery-advice {
   grid-column: 1 / -1;
 }
 
@@ -995,6 +1010,7 @@ input[aria-invalid="true"] {
   .planner-grid,
   .checklist-grid,
   .test-predictor-grid,
+  .recovery-plan-grid,
   .race-review-grid,
   .pacing-scenario-grid,
   .load-monitor-grid,
@@ -1017,6 +1033,7 @@ input[aria-invalid="true"] {
   .checklist-items,
   .test-estimate,
   .race-review-results,
+  .recovery-plan-results,
   .goal-ladder-results,
   .pacing-scenario-results,
   .load-monitor-results,
@@ -1060,6 +1077,7 @@ input[aria-invalid="true"] {
   .checklist-items,
   .test-estimate,
   .race-review-results,
+  .recovery-plan-results,
   .goal-ladder-results,
   .pacing-scenario-results,
   .load-monitor-results,

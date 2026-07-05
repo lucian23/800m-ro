@@ -308,6 +308,38 @@
           </form>
           <div class="warmup-plan" id="warmupPlan" aria-live="polite"></div>
         </div>
+
+        <div class="section-subheading">
+          <h3>Plan de hidratare si alimentatie</h3>
+          <p>Genereaza repere simple pentru masa principala, gustare, apa si electroliti in functie de ora startului, greutate si temperatura.</p>
+        </div>
+        <div class="fuel-plan-grid">
+          <form class="planner-form" id="fuelPlanForm">
+            <label>
+              Greutate sportiv / sportiva (kg)
+              <input id="athleteWeight" type="number" min="35" max="110" step="0.5" value="65">
+            </label>
+            <label>
+              Temperatura estimata (°C)
+              <input id="raceTemperature" type="number" min="0" max="42" value="24">
+            </label>
+            <label>
+              Sensibilitate stomac
+              <select id="stomachSensitivity">
+                <option value="normal">Normala</option>
+                <option value="sensitive">Sensibil / emotii mari</option>
+              </select>
+            </label>
+            <button class="button secondary" id="copyFuelPlan" type="button">Copiaza planul</button>
+            <p class="status-message" id="fuelStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="fuel-plan-results" aria-live="polite">
+            <article><span>Masa principala</span><strong id="mainMealTime">15:30</strong><p id="mainMealText">Carbohidrati simpli, proteina usoara, fara experimente.</p></article>
+            <article><span>Gustare</span><strong id="snackTime">17:15</strong><p id="snackText">Banana, baton simplu sau paine cu miere.</p></article>
+            <article><span>Apa pana la start</span><strong id="waterTarget">450 ml</strong><p id="waterText">In inghitituri mici, nu tot odata.</p></article>
+            <article class="fuel-advice"><span>Atentie</span><p id="fuelAdvice">Pastreaza doar alimente testate anterior.</p></article>
+          </div>
+        </div>
       </section>
 
       <section id="checklist" class="section checklist-section">
@@ -523,6 +555,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-04">4 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=load-monitor-20260704"></script>
+    <script src="app.js?v=fuel-plan-20260705"></script>
   </body>
 </html>

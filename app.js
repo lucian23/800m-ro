@@ -22,6 +22,10 @@ const warmupForm = document.querySelector("#warmupForm");
 const raceStartTime = document.querySelector("#raceStartTime");
 const warmupType = document.querySelector("#warmupType");
 const warmupPlan = document.querySelector("#warmupPlan");
+const fuelPlanForm = document.querySelector("#fuelPlanForm");
+const athleteWeight = document.querySelector("#athleteWeight");
+const raceTemperature = document.querySelector("#raceTemperature");
+const stomachSensitivity = document.querySelector("#stomachSensitivity");
 const raceChecklist = document.querySelector("#raceChecklist");
 const athleteSheetForm = document.querySelector("#athleteSheetForm");
 const athleteName = document.querySelector("#athleteName");
@@ -45,6 +49,7 @@ const copyPlan = document.querySelector("#copyPlan");
 const copyGoalLadder = document.querySelector("#copyGoalLadder");
 const copyLoadMonitor = document.querySelector("#copyLoadMonitor");
 const copyWarmup = document.querySelector("#copyWarmup");
+const copyFuelPlan = document.querySelector("#copyFuelPlan");
 const copyChecklist = document.querySelector("#copyChecklist");
 const resetChecklist = document.querySelector("#resetChecklist");
 const copyAthleteSheet = document.querySelector("#copyAthleteSheet");
@@ -57,6 +62,7 @@ const planStatus = document.querySelector("#planStatus");
 const goalStatus = document.querySelector("#goalStatus");
 const loadStatus = document.querySelector("#loadStatus");
 const warmupStatus = document.querySelector("#warmupStatus");
+const fuelStatus = document.querySelector("#fuelStatus");
 const checklistStatus = document.querySelector("#checklistStatus");
 const sheetStatus = document.querySelector("#sheetStatus");
 const pacingScenarioStatus = document.querySelector("#pacingScenarioStatus");
@@ -89,6 +95,13 @@ const fields = {
   qualityShare: document.querySelector("#qualityShare"),
   loadRisk: document.querySelector("#loadRisk"),
   loadAdvice: document.querySelector("#loadAdvice"),
+  mainMealTime: document.querySelector("#mainMealTime"),
+  mainMealText: document.querySelector("#mainMealText"),
+  snackTime: document.querySelector("#snackTime"),
+  snackText: document.querySelector("#snackText"),
+  waterTarget: document.querySelector("#waterTarget"),
+  waterText: document.querySelector("#waterText"),
+  fuelAdvice: document.querySelector("#fuelAdvice"),
   checklistProgress: document.querySelector("#checklistProgress"),
   checklistNext: document.querySelector("#checklistNext"),
   estimated800: document.querySelector("#estimated800"),
@@ -289,6 +302,9 @@ function buildSettingsUrl() {
   url.searchParams.set("sleep", sleepHours.value);
   url.searchParams.set("start", raceStartTime.value);
   url.searchParams.set("incalzire", warmupType.value);
+  url.searchParams.set("kg", athleteWeight.value);
+  url.searchParams.set("temp", raceTemperature.value);
+  url.searchParams.set("stomac", stomachSensitivity.value);
   url.searchParams.set("test", testType.value);
   url.searchParams.set("testt", testTime.value.trim());
   url.searchParams.set("rezultat", actualResult.value.trim());
@@ -325,6 +341,9 @@ function restoreFromUrl() {
     sleepHours: params.get("sleep"),
     raceStartTime: params.get("start"),
     warmupType: params.get("incalzire"),
+    athleteWeight: params.get("kg"),
+    raceTemperature: params.get("temp"),
+    stomachSensitivity: params.get("stomac"),
     testType: params.get("test"),
     testTime: params.get("testt"),
     actualResult: params.get("rezultat"),
@@ -351,6 +370,9 @@ function restoreFromUrl() {
   if (values.sleepHours) sleepHours.value = values.sleepHours;
   if (/^\d{2}:\d{2}$/.test(values.raceStartTime || "")) raceStartTime.value = values.raceStartTime;
   if ([...warmupType.options].some((option) => option.value === values.warmupType)) warmupType.value = values.warmupType;
+  if (values.athleteWeight) athleteWeight.value = values.athleteWeight;
+  if (values.raceTemperature) raceTemperature.value = values.raceTemperature;
+  if ([...stomachSensitivity.options].some((option) => option.value === values.stomachSensitivity)) stomachSensitivity.value = values.stomachSensitivity;
   if ([...testType.options].some((option) => option.value === values.testType)) testType.value = values.testType;
   if (values.testTime) testTime.value = values.testTime;
   if (values.actualResult) actualResult.value = values.actualResult;
@@ -610,6 +632,49 @@ function warmupSummary() {
   ].join("\n");
 }
 
+function updateFuelPlan() {
+  const weight = clampNumber(athleteWeight, 35, 110, 65);
+  const temperature = clampNumber(raceTemperature, 0, 42, 24);
+  const sensitive = stomachSensitivity.value === "sensitive";
+  const hotWeather = temperature >= 27;
+  const veryHotWeather = temperature >= 32;
+  const baseWater = Math.round((weight * (hotWeather ? 8 : 6)) / 50) * 50;
+  const water = Math.max(300, Math.min(900, baseWater + (veryHotWeather ? 150 : 0)));
+
+  fields.mainMealTime.textContent = timeOffset(raceStartTime.value || "18:30", sensitive ? -240 : -210);
+  fields.snackTime.textContent = timeOffset(raceStartTime.value || "18:30", sensitive ? -100 : -75);
+  fields.waterTarget.textContent = `${water} ml`;
+  fields.mainMealText.textContent = sensitive
+    ? "Masa foarte simpla: orez/paste/paine, putina proteina, fara grasimi multe si fara fibre."
+    : "Carbohidrati simpli, proteina usoara, putine grasimi si fara experimente.";
+  fields.snackText.textContent = sensitive
+    ? "Gustare mica si testata: banana sau cateva guri de baton simplu. Evita lactatele."
+    : "Banana, baton simplu, paine cu miere sau covrig; doar variante deja testate.";
+  fields.waterText.textContent = hotWeather
+    ? "In inghitituri mici. Include electroliti daca transpiri mult sau este soare puternic."
+    : "In inghitituri mici, nu tot odata. Ultimele guri cu 10-15 min inainte de start.";
+  fields.fuelAdvice.textContent = veryHotWeather
+    ? "Temperatura ridicata: cauta umbra, racire usoara si nu creste incalzirea peste necesar."
+    : sensitive
+      ? "Cu stomac sensibil, prioritatea este simplitatea: mai putin, mai devreme, doar alimente cunoscute."
+      : "Pastreaza doar alimente testate anterior si evita bauturile foarte dulci chiar inainte de start.";
+  syncUrlState();
+}
+
+function fuelPlanSummary() {
+  return [
+    "Plan hidratare si alimentatie 800 m",
+    `Start: ${raceStartTime.value}`,
+    `Greutate: ${athleteWeight.value} kg`,
+    `Temperatura: ${raceTemperature.value} °C`,
+    `Sensibilitate stomac: ${stomachSensitivity.selectedOptions[0].textContent}`,
+    `Masa principala (${fields.mainMealTime.textContent}): ${fields.mainMealText.textContent}`,
+    `Gustare (${fields.snackTime.textContent}): ${fields.snackText.textContent}`,
+    `Apa pana la start: ${fields.waterTarget.textContent} — ${fields.waterText.textContent}`,
+    `Atentie: ${fields.fuelAdvice.textContent}`
+  ].join("\n");
+}
+
 function readChecklistState() {
   try {
     return JSON.parse(window.localStorage.getItem(checklistStorageKey) || "{}");
@@ -687,6 +752,7 @@ function athleteSheetSummary() {
     `Incarcare saptamanala: ${fields.totalKm.textContent}, calitate ${fields.qualityShare.textContent}, risc ${fields.loadRisk.textContent}`,
     `Plan saptamana: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte`,
     `Incalzire: ${warmupType.selectedOptions[0].textContent}, start ${raceStartTime.value}`,
+    `Hidratare/alimentatie: masa ${fields.mainMealTime.textContent}, gustare ${fields.snackTime.textContent}, apa ${fields.waterTarget.textContent}`,
     `Checklist: ${checkedCount}/${checklistItems.length} bifate`,
     `Pacing: primul 400 m ${fields.scenarioFirstLap.textContent}, turul doi ${fields.scenarioSecondLap.textContent}, balans ${fields.scenarioBalance.textContent}`,
     `Analiza cursa: ${fields.raceDelta.textContent}; ${fields.lapBalance.textContent}`,
@@ -1103,6 +1169,8 @@ targetTime.addEventListener("input", enableUrlSync(updateCalculator));
 targetTime.addEventListener("input", enableUrlSync(updateRaceReview));
 targetTime.addEventListener("input", enableUrlSync(updateGoalLadder));
 targetTime.addEventListener("input", enableUrlSync(updatePacingScenario));
+raceStartTime.addEventListener("input", enableUrlSync(updateFuelPlan));
+raceStartTime.addEventListener("change", enableUrlSync(updateFuelPlan));
 raceProfile.addEventListener("change", enableUrlSync(updateCalculator));
 trainingFocus.addEventListener("change", enableUrlSync(updateCalculator));
 standardGender.addEventListener("change", enableUrlSync(updateCalculator));
@@ -1114,6 +1182,8 @@ loadMonitorForm.addEventListener("input", enableUrlSync(updateLoadMonitor));
 loadMonitorForm.addEventListener("change", enableUrlSync(updateLoadMonitor));
 warmupForm.addEventListener("input", enableUrlSync(updateWarmup));
 warmupForm.addEventListener("change", enableUrlSync(updateWarmup));
+fuelPlanForm.addEventListener("input", enableUrlSync(updateFuelPlan));
+fuelPlanForm.addEventListener("change", enableUrlSync(updateFuelPlan));
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -1128,6 +1198,7 @@ copyPlan.addEventListener("click", () => copyText(planSummary(), planStatus, "Pl
 copyGoalLadder.addEventListener("click", () => copyText(goalLadderSummary(), goalStatus, "Scara obiectivului a fost copiata."));
 copyLoadMonitor.addEventListener("click", () => copyText(loadMonitorSummary(), loadStatus, "Incarcarea saptamanala a fost copiata."));
 copyWarmup.addEventListener("click", () => copyText(warmupSummary(), warmupStatus, "Incalzirea a fost copiata."));
+copyFuelPlan.addEventListener("click", () => copyText(fuelPlanSummary(), fuelStatus, "Planul de hidratare a fost copiat."));
 copyChecklist.addEventListener("click", () => copyText(checklistSummary(), checklistStatus, "Checklistul a fost copiat."));
 resetChecklist.addEventListener("click", () => {
   resetChecklistState();
@@ -1161,6 +1232,7 @@ updatePlan();
 updateGoalLadder();
 updateLoadMonitor();
 updateWarmup();
+updateFuelPlan();
 updatePacingScenario();
 renderChecklist();
 updateTestEstimate();

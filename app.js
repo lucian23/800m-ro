@@ -262,6 +262,60 @@ const workouts = [
     category: "technique",
     load: "mediu",
     text: "Trunchi, sold, glezna si stabilitate. Alergatorul de 800 m are nevoie de postura solida sub oboseala."
+  },
+  {
+    title: "Fartlek 8-6-4-2 min",
+    category: "aerobic",
+    load: "mediu",
+    text: "Alternanta de ritm: 8 min tempo, 4 min usor, 6 min tempo, 3 min usor, 4 min repede, 2 min usor. Bun pentru toleranta la schimbari de ritm."
+  },
+  {
+    title: "8 x 200 m dealuri",
+    category: "technique",
+    load: "mediu",
+    text: "Panta usoara (3-6%), alergare tehnica, coborare in revenire. Forta specifica fara impactul pistei plate."
+  },
+  {
+    title: "400 m + 300 m + 200 m progresiv",
+    category: "specific",
+    load: "ridicat",
+    text: "400 m la 95%, pauza 5 min, 300 m la ritm de cursa, pauza 4 min, 200 m rapid. Simuleaza finalul de cursa."
+  },
+  {
+    title: "10 x 100 m ritm de cursa",
+    category: "specific",
+    load: "mediu",
+    text: "Pauza 45-60 sec. Volum mare la ritm tinta, fara oboseala extrema. Construieste memoria ritmului."
+  },
+  {
+    title: "Activare pre-concurs (cu 2 zile inainte)",
+    category: "speed",
+    load: "mic",
+    text: "15 min jogging, mobilitate, 3 x 80 m progresiv, 1 x 200 m la ritm de cursa. Senzatia de prospetime este obiectivul."
+  },
+  {
+    title: "Test 600 m + 5 x 200 m",
+    category: "specific",
+    load: "ridicat",
+    text: "600 m controlat la 95%, pauza 12 min, apoi 5 x 200 m la ritm de cursa cu pauza 2 min. Sedinta de diagnostic."
+  },
+  {
+    title: "30 min progresiv",
+    category: "aerobic",
+    load: "mediu",
+    text: "Incepi usor, cresti pana la ritm de tempo in ultimele 10 min. Fara sprint, doar control progresiv."
+  },
+  {
+    title: "2 x (4 x 150 m) split-set",
+    category: "speed",
+    load: "ridicat",
+    text: "4 x 150 m rapid cu pauza 1:30, pauza 5 min intre seturi. Al doilea set testeaza capacitatea de a repeta viteza sub oboseala."
+  },
+  {
+    title: "Circuit mobilitate + forta statica",
+    category: "technique",
+    load: "mic",
+    text: "Genuflexiuni, fandari, placi, spate si glezna. 40 sec lucru, 20 sec pauza. Mentine amplitudinea fara incarcare."
   }
 ];
 

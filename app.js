@@ -45,6 +45,10 @@ const nextRaceDays = document.querySelector("#nextRaceDays");
 const nextSessionForm = document.querySelector("#nextSessionForm");
 const nextSessionPriority = document.querySelector("#nextSessionPriority");
 const daysAfterRace = document.querySelector("#daysAfterRace");
+const timelineDayForm = document.querySelector("#timelineDayForm");
+const wakeUpTime = document.querySelector("#wakeUpTime");
+const travelMinutes = document.querySelector("#travelMinutes");
+const morningMealStyle = document.querySelector("#morningMealStyle");
 const personalStrategy = document.querySelector("#personalStrategy");
 const pacingScenarioForm = document.querySelector("#pacingScenarioForm");
 const pacingScenarioType = document.querySelector("#pacingScenarioType");
@@ -66,6 +70,7 @@ const copyTestEstimate = document.querySelector("#copyTestEstimate");
 const copyRaceReview = document.querySelector("#copyRaceReview");
 const copyRecoveryPlan = document.querySelector("#copyRecoveryPlan");
 const copyNextSession = document.querySelector("#copyNextSession");
+const copyTimelineDay = document.querySelector("#copyTimelineDay");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const goalStatus = document.querySelector("#goalStatus");
@@ -79,6 +84,7 @@ const testStatus = document.querySelector("#testStatus");
 const raceReviewStatus = document.querySelector("#raceReviewStatus");
 const recoveryStatus = document.querySelector("#recoveryStatus");
 const nextSessionStatus = document.querySelector("#nextSessionStatus");
+const timelineDayStatus = document.querySelector("#timelineDayStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
@@ -133,6 +139,16 @@ const fields = {
   nextSessionVolume: document.querySelector("#nextSessionVolume"),
   nextSessionVolumeText: document.querySelector("#nextSessionVolumeText"),
   nextSessionAdvice: document.querySelector("#nextSessionAdvice"),
+  tlWakeUp: document.querySelector("#tlWakeUp"),
+  tlWakeUpText: document.querySelector("#tlWakeUpText"),
+  tlBreakfast: document.querySelector("#tlBreakfast"),
+  tlBreakfastText: document.querySelector("#tlBreakfastText"),
+  tlDeparture: document.querySelector("#tlDeparture"),
+  tlDepartureText: document.querySelector("#tlDepartureText"),
+  tlArrival: document.querySelector("#tlArrival"),
+  tlArrivalText: document.querySelector("#tlArrivalText"),
+  tlStart: document.querySelector("#tlStart"),
+  tlStartText: document.querySelector("#tlStartText"),
   scenarioFirstLap: document.querySelector("#scenarioFirstLap"),
   scenarioSecondLap: document.querySelector("#scenarioSecondLap"),
   scenarioBalance: document.querySelector("#scenarioBalance"),
@@ -337,6 +353,9 @@ function buildSettingsUrl() {
   url.searchParams.set("urmator", nextRaceDays.value);
   url.searchParams.set("prioritate", nextSessionPriority.value);
   url.searchParams.set("dupa", daysAfterRace.value);
+  url.searchParams.set("trezire", wakeUpTime.value);
+  url.searchParams.set("drum", travelMinutes.value);
+  url.searchParams.set("dmasa", morningMealStyle.value);
   url.searchParams.set("sportiv", athleteName.value.trim());
   url.searchParams.set("concurs", competitionName.value.trim());
   url.searchParams.set("pacing", pacingScenarioType.value);
@@ -381,6 +400,9 @@ function restoreFromUrl() {
     nextRaceDays: params.get("urmator"),
     nextSessionPriority: params.get("prioritate"),
     daysAfterRace: params.get("dupa"),
+    wakeUpTime: params.get("trezire"),
+    travelMinutes: params.get("drum"),
+    morningMealStyle: params.get("dmasa"),
     athleteName: params.get("sportiv"),
     competitionName: params.get("concurs"),
     pacingScenarioType: params.get("pacing"),
@@ -415,6 +437,9 @@ function restoreFromUrl() {
   if (values.nextRaceDays) nextRaceDays.value = values.nextRaceDays;
   if ([...nextSessionPriority.options].some((option) => option.value === values.nextSessionPriority)) nextSessionPriority.value = values.nextSessionPriority;
   if (values.daysAfterRace) daysAfterRace.value = values.daysAfterRace;
+  if (/^\d{2}:\d{2}$/.test(values.wakeUpTime || "")) wakeUpTime.value = values.wakeUpTime;
+  if (values.travelMinutes) travelMinutes.value = values.travelMinutes;
+  if ([...morningMealStyle.options].some((option) => option.value === values.morningMealStyle)) morningMealStyle.value = values.morningMealStyle;
   if (values.athleteName) athleteName.value = values.athleteName;
   if (values.competitionName) competitionName.value = values.competitionName;
   if ([...pacingScenarioType.options].some((option) => option.value === values.pacingScenarioType)) pacingScenarioType.value = values.pacingScenarioType;
@@ -796,6 +821,7 @@ function athleteSheetSummary() {
     `Analiza cursa: ${fields.raceDelta.textContent}; ${fields.lapBalance.textContent}`,
     `Recuperare: ${fields.recoveryDay1.textContent}, ${fields.recoveryDay2.textContent}, prima calitate ${fields.nextQualityDay.textContent}`,
     `Urmatoarea sedinta: ${fields.nextSessionTitle.textContent} — ${fields.nextSessionDetails.textContent}`,
+    `Timeline ziua cursei: trezire ${fields.tlWakeUp.textContent}, sosire ${fields.tlArrival.textContent}, start ${fields.tlStart.textContent}`,
     `Concluzie: ${fields.raceReviewAdvice.textContent}`
   ].join("\n");
 }
@@ -1140,6 +1166,57 @@ function nextSessionSummary() {
   ].join("\n");
 }
 
+function updateTimelineDay() {
+  const start = raceStartTime.value || "18:30";
+  const wakeRaw = wakeUpTime.value || "07:00";
+  const travel = clampNumber(travelMinutes, 5, 180, 45);
+  const meal = morningMealStyle.value;
+  const isRace = warmupType.value === "race";
+  const [sH, sM] = start.split(":").map(Number);
+  const startMins = sH * 60 + sM;
+
+  fields.tlWakeUp.textContent = wakeRaw;
+  fields.tlWakeUpText.textContent = isRace
+    ? "Trezire linistita, hidratare imediata (250-350 ml apa), evitati cafeaua tare daca nu este testata."
+    : "Trezire fara presiune, pregatiti gustarea si verificati vremea.";
+
+  fields.tlBreakfast.textContent = timeOffset(wakeRaw, 15);
+  fields.tlBreakfastText.textContent = meal === "light"
+    ? "Masa usoara: banana, paine cu miere si ceai. Fara grasimi, lactate sau fibre multe."
+    : "Carbohidrati simpli si o sursa usoara de proteina; fara experimente si fara portii mari.";
+
+  const departAdvance = Math.max(travel + 75, 90);
+  const departTime = timeOffset(start, -departAdvance);
+  fields.tlDeparture.textContent = departTime;
+  fields.tlDepartureText.textContent = isRace
+    ? "Geanta verificata: numar de concurs, ace, bluza, incaltaminte, apa, gustare mica."
+    : "Iesirea din casa fara graba; bagajul pregatit cu o seara inainte.";
+
+  const arrivalTime = timeOffset(start, -55 - 12);
+  fields.tlArrival.textContent = arrivalTime;
+  fields.tlArrivalText.textContent = isRace
+    ? "Ridicare numar, recunoastere pista si camera de apel, toaleta, verificare incaltaminte."
+    : "Recunoastere pista, cateva minute de mers, intindere usoara.";
+
+  fields.tlStart.textContent = start;
+  fields.tlStartText.textContent = isRace
+    ? "Incalzirea incepe cu 55 min inainte de start. Ultimele guri de apa cu 10-15 min inainte de camera de apel."
+    : "Incalzirea incepe conform planului de mai sus; pastrati o sticla de apa langa pista.";
+  syncUrlState();
+}
+
+function timelineDaySummary() {
+  return [
+    "Timeline ziua cursei 800 m",
+    `Trezire: ${fields.tlWakeUp.textContent} — ${fields.tlWakeUpText.textContent}`,
+    `Mic dejun: ${fields.tlBreakfast.textContent} — ${fields.tlBreakfastText.textContent}`,
+    `Plecare: ${fields.tlDeparture.textContent} — ${fields.tlDepartureText.textContent}`,
+    `Sosire: ${fields.tlArrival.textContent} — ${fields.tlArrivalText.textContent}`,
+    `Start: ${fields.tlStart.textContent} — ${fields.tlStartText.textContent}`,
+    `Tip sesiune: ${warmupType.selectedOptions[0].textContent}`
+  ].join("\n");
+}
+
 function recoveryPlanSummary() {
   return [
     "Plan recuperare dupa cursa 800 m",
@@ -1338,6 +1415,10 @@ warmupForm.addEventListener("input", enableUrlSync(updateWarmup));
 warmupForm.addEventListener("change", enableUrlSync(updateWarmup));
 fuelPlanForm.addEventListener("input", enableUrlSync(updateFuelPlan));
 fuelPlanForm.addEventListener("change", enableUrlSync(updateFuelPlan));
+timelineDayForm.addEventListener("input", enableUrlSync(updateTimelineDay));
+timelineDayForm.addEventListener("change", enableUrlSync(updateTimelineDay));
+wakeUpTime.addEventListener("input", enableUrlSync(updateTimelineDay));
+wakeUpTime.addEventListener("change", enableUrlSync(updateTimelineDay));
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -1375,6 +1456,7 @@ copyTestEstimate.addEventListener("click", () => copyText(testEstimateSummary(),
 copyRaceReview.addEventListener("click", () => copyText(raceReviewSummary(), raceReviewStatus, "Analiza a fost copiata."));
 copyRecoveryPlan.addEventListener("click", () => copyText(recoveryPlanSummary(), recoveryStatus, "Planul de recuperare a fost copiat."));
 copyNextSession.addEventListener("click", () => copyText(nextSessionSummary(), nextSessionStatus, "Sedinta urmatoare a fost copiata."));
+copyTimelineDay.addEventListener("click", () => copyText(timelineDaySummary(), timelineDayStatus, "Timeline-ul a fost copiat."));
 raceChecklist.addEventListener("change", (event) => {
   if (!event.target.matches("input[type='checkbox']")) return;
   const state = readChecklistState();
@@ -1399,6 +1481,7 @@ updateGoalLadder();
 updateLoadMonitor();
 updateWarmup();
 updateFuelPlan();
+updateTimelineDay();
 updatePacingScenario();
 renderChecklist();
 updateTestEstimate();

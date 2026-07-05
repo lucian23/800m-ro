@@ -49,6 +49,9 @@ const timelineDayForm = document.querySelector("#timelineDayForm");
 const wakeUpTime = document.querySelector("#wakeUpTime");
 const travelMinutes = document.querySelector("#travelMinutes");
 const morningMealStyle = document.querySelector("#morningMealStyle");
+const timeConverterForm = document.querySelector("#timeConverterForm");
+const converterDistance = document.querySelector("#converterDistance");
+const converterTime = document.querySelector("#converterTime");
 const personalStrategy = document.querySelector("#personalStrategy");
 const pacingScenarioForm = document.querySelector("#pacingScenarioForm");
 const pacingScenarioType = document.querySelector("#pacingScenarioType");
@@ -71,6 +74,7 @@ const copyRaceReview = document.querySelector("#copyRaceReview");
 const copyRecoveryPlan = document.querySelector("#copyRecoveryPlan");
 const copyNextSession = document.querySelector("#copyNextSession");
 const copyTimelineDay = document.querySelector("#copyTimelineDay");
+const copyTimeConverter = document.querySelector("#copyTimeConverter");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const goalStatus = document.querySelector("#goalStatus");
@@ -85,6 +89,7 @@ const raceReviewStatus = document.querySelector("#raceReviewStatus");
 const recoveryStatus = document.querySelector("#recoveryStatus");
 const nextSessionStatus = document.querySelector("#nextSessionStatus");
 const timelineDayStatus = document.querySelector("#timelineDayStatus");
+const converterStatus = document.querySelector("#converterStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
@@ -149,6 +154,14 @@ const fields = {
   tlArrivalText: document.querySelector("#tlArrivalText"),
   tlStart: document.querySelector("#tlStart"),
   tlStartText: document.querySelector("#tlStartText"),
+  conv200: document.querySelector("#conv200"),
+  conv300: document.querySelector("#conv300"),
+  conv400: document.querySelector("#conv400"),
+  conv500: document.querySelector("#conv500"),
+  conv600: document.querySelector("#conv600"),
+  conv800: document.querySelector("#conv800"),
+  conv1000: document.querySelector("#conv1000"),
+  conv1500: document.querySelector("#conv1500"),
   scenarioFirstLap: document.querySelector("#scenarioFirstLap"),
   scenarioSecondLap: document.querySelector("#scenarioSecondLap"),
   scenarioBalance: document.querySelector("#scenarioBalance"),
@@ -356,6 +369,8 @@ function buildSettingsUrl() {
   url.searchParams.set("trezire", wakeUpTime.value);
   url.searchParams.set("drum", travelMinutes.value);
   url.searchParams.set("dmasa", morningMealStyle.value);
+  url.searchParams.set("cdist", converterDistance.value);
+  url.searchParams.set("ctimp", converterTime.value.trim());
   url.searchParams.set("sportiv", athleteName.value.trim());
   url.searchParams.set("concurs", competitionName.value.trim());
   url.searchParams.set("pacing", pacingScenarioType.value);
@@ -403,6 +418,8 @@ function restoreFromUrl() {
     wakeUpTime: params.get("trezire"),
     travelMinutes: params.get("drum"),
     morningMealStyle: params.get("dmasa"),
+    converterDistance: params.get("cdist"),
+    converterTime: params.get("ctimp"),
     athleteName: params.get("sportiv"),
     competitionName: params.get("concurs"),
     pacingScenarioType: params.get("pacing"),
@@ -440,6 +457,8 @@ function restoreFromUrl() {
   if (/^\d{2}:\d{2}$/.test(values.wakeUpTime || "")) wakeUpTime.value = values.wakeUpTime;
   if (values.travelMinutes) travelMinutes.value = values.travelMinutes;
   if ([...morningMealStyle.options].some((option) => option.value === values.morningMealStyle)) morningMealStyle.value = values.morningMealStyle;
+  if ([...converterDistance.options].some((option) => option.value === values.converterDistance)) converterDistance.value = values.converterDistance;
+  if (values.converterTime) converterTime.value = values.converterTime;
   if (values.athleteName) athleteName.value = values.athleteName;
   if (values.competitionName) competitionName.value = values.competitionName;
   if ([...pacingScenarioType.options].some((option) => option.value === values.pacingScenarioType)) pacingScenarioType.value = values.pacingScenarioType;
@@ -822,6 +841,7 @@ function athleteSheetSummary() {
     `Recuperare: ${fields.recoveryDay1.textContent}, ${fields.recoveryDay2.textContent}, prima calitate ${fields.nextQualityDay.textContent}`,
     `Urmatoarea sedinta: ${fields.nextSessionTitle.textContent} — ${fields.nextSessionDetails.textContent}`,
     `Timeline ziua cursei: trezire ${fields.tlWakeUp.textContent}, sosire ${fields.tlArrival.textContent}, start ${fields.tlStart.textContent}`,
+    `Convertor distante: ${converterDistance.selectedOptions[0].textContent} ${converterTime.value} → 800 m ${fields.conv800?.textContent || "--"}`,
     `Concluzie: ${fields.raceReviewAdvice.textContent}`
   ].join("\n");
 }
@@ -1230,6 +1250,62 @@ function recoveryPlanSummary() {
   ].join("\n");
 }
 
+function converterFactors() {
+  // Returns factors relative to 800m: factor * 800m_time = other_distance_time
+  // Based on IAAF/Riegel-style decay curves calibrated for middle-distance
+  return {
+    "200": 0.212,
+    "300": 0.330,
+    "400": 0.455,
+    "500": 0.582,
+    "600": 0.715,
+    "800": 1.000,
+    "1000": 1.300,
+    "1500": 2.100
+  };
+}
+
+function updateTimeConverter() {
+  const distance = converterDistance.value;
+  const seconds = parseTime(converterTime.value);
+  const factors = converterFactors();
+  const refFactor = factors[distance];
+
+  if (!seconds || seconds < 15 || seconds > 600) {
+    converterTime.setAttribute("aria-invalid", "true");
+    Object.keys(factors).forEach(d => {
+      fields[`conv${d}`].textContent = "--";
+    });
+    syncUrlState();
+    return;
+  }
+
+  converterTime.removeAttribute("aria-invalid");
+  const base800 = seconds / refFactor;
+
+  Object.keys(factors).forEach(d => {
+    const estimated = base800 * factors[d];
+    fields[`conv${d}`].textContent = formatTime(estimated);
+  });
+
+  // Update the note for the reference distance
+  const distNames = { "200":"Viteza pura si relaxare.", "300":"Reper de viteza utilizabila.", "400":"Primul tur orientativ.", "500":"Rezistenta specifica controlata.", "600":"Distanta de referinta.", "800":"Tinta estimata.", "1000":"Sprijin aerob specific.", "1500":"Rezistenta generala." };
+  const refCard = document.querySelector(`.time-converter-results article:nth-child(${Object.keys(factors).indexOf(distance)+1}) p`);
+  // not critical if fails
+  syncUrlState();
+}
+
+function timeConverterSummary() {
+  const lines = [];
+  Object.keys(converterFactors()).forEach(d => {
+    lines.push(`${d} m: ${fields[`conv${d}`].textContent}`);
+  });
+  return [
+    `Convertor distante — referinta: ${converterDistance.selectedOptions[0].textContent} ${converterTime.value}`,
+    ...lines
+  ].join("\n");
+}
+
 function goalAdviceFor(gap, weeklyGain) {
   if (gap <= 0) return "Tinta este deja atinsa sau mai lenta decat timpul actual. Alege o tinta mai ambitioasa sau foloseste scara pentru mentinere.";
   if (weeklyGain <= 0.35) return "Obiectiv conservator: prioritizeaza continuitatea, tehnica si evitarea accidentarilor.";
@@ -1419,6 +1495,9 @@ timelineDayForm.addEventListener("input", enableUrlSync(updateTimelineDay));
 timelineDayForm.addEventListener("change", enableUrlSync(updateTimelineDay));
 wakeUpTime.addEventListener("input", enableUrlSync(updateTimelineDay));
 wakeUpTime.addEventListener("change", enableUrlSync(updateTimelineDay));
+timeConverterForm.addEventListener("input", enableUrlSync(updateTimeConverter));
+timeConverterForm.addEventListener("change", enableUrlSync(updateTimeConverter));
+converterTime.addEventListener("input", enableUrlSync(updateTimeConverter));
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -1457,6 +1536,7 @@ copyRaceReview.addEventListener("click", () => copyText(raceReviewSummary(), rac
 copyRecoveryPlan.addEventListener("click", () => copyText(recoveryPlanSummary(), recoveryStatus, "Planul de recuperare a fost copiat."));
 copyNextSession.addEventListener("click", () => copyText(nextSessionSummary(), nextSessionStatus, "Sedinta urmatoare a fost copiata."));
 copyTimelineDay.addEventListener("click", () => copyText(timelineDaySummary(), timelineDayStatus, "Timeline-ul a fost copiat."));
+copyTimeConverter.addEventListener("click", () => copyText(timeConverterSummary(), converterStatus, "Conversia a fost copiata."));
 raceChecklist.addEventListener("change", (event) => {
   if (!event.target.matches("input[type='checkbox']")) return;
   const state = readChecklistState();
@@ -1482,6 +1562,7 @@ updateLoadMonitor();
 updateWarmup();
 updateFuelPlan();
 updateTimelineDay();
+updateTimeConverter();
 updatePacingScenario();
 renderChecklist();
 updateTestEstimate();

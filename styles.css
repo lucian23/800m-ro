@@ -275,6 +275,8 @@ h3 {
 .test-estimate,
 .race-review-results,
 .recovery-plan-results,
+.timeline-day-results,
+.time-converter-results,
 .pacing-scenario-results,
 .load-monitor-results,
 .fuel-plan-results,
@@ -306,6 +308,8 @@ h3 {
 .test-estimate article,
 .race-review-results article,
 .recovery-plan-results article,
+.timeline-day-results article,
+.time-converter-results article,
 .pacing-scenario-results article,
 .load-monitor-results article,
 .goal-ladder-results article,
@@ -340,6 +344,8 @@ h3 {
 .test-estimate span,
 .race-review-results span,
 .recovery-plan-results span,
+.timeline-day-results span,
+.time-converter-results span,
 .pacing-scenario-results span,
 .load-monitor-results span,
 .fuel-plan-results span,
@@ -788,7 +794,9 @@ input[aria-invalid="true"] {
 }
 
 .recovery-plan-grid,
-.next-session-grid {
+.next-session-grid,
+.timeline-day-grid,
+.time-converter-grid {
   grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
   gap: 24px;
   align-items: stretch;
@@ -818,6 +826,8 @@ input[aria-invalid="true"] {
 .race-review-results,
 .recovery-plan-results,
 .next-session-results,
+.timeline-day-results,
+.time-converter-results,
 .goal-ladder-results,
 .pacing-scenario-results,
 .load-monitor-results,
@@ -833,6 +843,8 @@ input[aria-invalid="true"] {
 .race-review-results article,
 .recovery-plan-results article,
 .next-session-results article,
+.timeline-day-results article,
+.time-converter-results article,
 .goal-ladder-results article,
 .pacing-scenario-results article,
 .load-monitor-results article,
@@ -847,6 +859,8 @@ input[aria-invalid="true"] {
 .race-review-results strong,
 .recovery-plan-results strong,
 .next-session-results strong,
+.timeline-day-results strong,
+.time-converter-results strong,
 .goal-ladder-results strong,
 .pacing-scenario-results strong,
 .load-monitor-results strong,
@@ -868,6 +882,8 @@ input[aria-invalid="true"] {
 .race-review-results p,
 .recovery-plan-results p,
 .next-session-results p,
+.timeline-day-results p,
+.time-converter-results p,
 .goal-ladder-results p,
 .pacing-scenario-results p,
 .load-monitor-results p,
@@ -881,7 +897,9 @@ input[aria-invalid="true"] {
 .load-monitor-results .load-advice,
 .fuel-plan-results .fuel-advice,
 .recovery-plan-results .recovery-advice,
-.next-session-results .next-session-advice {
+.next-session-results .next-session-advice,
+.timeline-day-results .timeline-day-advice,
+.time-converter-results .converter-note {
   grid-column: 1 / -1;
 }
 
@@ -1088,6 +1106,8 @@ input[aria-invalid="true"] {
   .race-review-results,
   .recovery-plan-results,
   .next-session-results,
+  .timeline-day-results,
+  .time-converter-results,
   .goal-ladder-results,
   .pacing-scenario-results,
   .load-monitor-results,

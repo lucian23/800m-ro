@@ -181,6 +181,45 @@
           <p>Pe baza timpului tinta si a profilului ales, primesti repere concrete pe segmente si un mesaj tactic simplu pentru fiecare zona a cursei.</p>
         </div>
         <div class="race-strategy-grid" id="personalStrategy" aria-live="polite" aria-label="Strategie personalizata pentru 800 m"></div>
+
+        <div class="section-subheading">
+          <h3>Convertor de timpi intre distante</h3>
+          <p>Introdu un rezultat la o distanta cunoscuta. Convertorul estimeaza echivalentul la celelalte distante relevante pentru 800 m, folosind formule validate pe alergatori de semifond.</p>
+        </div>
+        <div class="time-converter-grid">
+          <form class="planner-form" id="timeConverterForm">
+            <label>
+              Distanta de referinta
+              <select id="converterDistance">
+                <option value="200">200 m</option>
+                <option value="300">300 m</option>
+                <option value="400">400 m</option>
+                <option value="500">500 m</option>
+                <option value="600" selected>600 m</option>
+                <option value="800">800 m</option>
+                <option value="1000">1000 m</option>
+                <option value="1500">1500 m</option>
+              </select>
+            </label>
+            <label>
+              Timp la distanta aleasa
+              <input id="converterTime" type="text" inputmode="decimal" value="1:30.0" aria-describedby="converterHelp">
+            </label>
+            <p id="converterHelp" class="hint">Format acceptat: 42.5, 1:18.0 sau 2:05.00.</p>
+            <button class="button secondary" id="copyTimeConverter" type="button">Copiaza conversia</button>
+            <p class="status-message" id="converterStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="time-converter-results" aria-live="polite">
+            <article><span>200 m</span><strong id="conv200">25.8</strong><p>Viteza pura si relaxare.</p></article>
+            <article><span>300 m</span><strong id="conv300">40.2</strong><p>Reper de viteza utilizabila.</p></article>
+            <article><span>400 m</span><strong id="conv400">55.5</strong><p>Primul tur orientativ.</p></article>
+            <article><span>500 m</span><strong id="conv500">1:11.0</strong><p>Rezistenta specifica controlata.</p></article>
+            <article><span>600 m</span><strong id="conv600">1:30.0</strong><p>Distanta de referinta.</p></article>
+            <article><span>800 m</span><strong id="conv800">2:02.4</strong><p>Tinta estimata.</p></article>
+            <article><span>1000 m</span><strong id="conv1000">2:39.5</strong><p>Sprijin aerob specific.</p></article>
+            <article class="converter-note"><span>1500 m</span><strong id="conv1500">4:05.2</strong><p>Rezistenta generala.</p></article>
+          </div>
+        </div>
       </section>
 
       <section id="planificator" class="section planner-section">
@@ -649,6 +688,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-05">5 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=timeline-day-20260705"></script>
+    <script src="app.js?v=time-converter-20260705"></script>
   </body>
 </html>

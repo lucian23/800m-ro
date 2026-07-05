@@ -332,6 +332,38 @@
             <article><span>Calitate</span><strong id="qualityShare">20%</strong></article>
             <article><span>Scor risc</span><strong id="loadRisk">moderat</strong></article>
             <article class="load-advice"><span>Recomandare</span><p id="loadAdvice">Saptamana este echilibrata daca zilele grele sunt separate de revenire.</p></article>
+
+          </div>
+        </div>
+
+        <div class="section-subheading">
+          <h3>Calculator de taper pentru 800 m</h3>
+          <p>In functie de numarul de saptamani pana la cursa importanta, instrumentul sugereaza cum sa reduci volumul si sa pastrezi calitatea pentru a ajunge proaspat, dar in forma, la start.</p>
+        </div>
+        <div class="taper-grid">
+          <form class="planner-form" id="taperForm">
+            <label>
+              Saptamani pana la concursul tinta
+              <input id="taperWeeks" type="number" min="1" max="4" value="2">
+            </label>
+            <label>
+              Nivel sportiv
+              <select id="taperLevel">
+                <option value="junior">Junior / in formare</option>
+                <option value="club" selected>Club competitiv</option>
+                <option value="advanced">Avansat</option>
+              </select>
+            </label>
+            <p class="hint">Taperul pentru 800 m este mai scurt decat la probele de anduranta. Intensitatea ramane, volumul scade.</p>
+            <button class="button secondary" id="copyTaper" type="button">Copiaza planul de taper</button>
+            <p class="status-message" id="taperStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="taper-results" aria-live="polite">
+            <article><span>Saptamana -2</span><strong id="tpWeek2">Volum ~80%, calitate mentinuta</strong><p id="tpWeek2Text">Ultima sedinta de calitate serioasa la inceputul saptamanii.</p></article>
+            <article><span>Saptamana concursului</span><strong id="tpWeek1">Volum ~55%, activare</strong><p id="tpWeek1Text">Sedinte scurte, ritm de cursa, prospetime.</p></article>
+            <article class="taper-advice"><span>Regula</span><p id="tpAdvice">Mai bine putin subantrenat decat putin supraantrenat la start.</p></article>
+          </div>
+        </div>
           </div>
         </div>
       </section>
@@ -763,6 +795,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-05">5 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=split-analyzer-20260705"></script>
+    <script src="app.js?v=taper-20260705"></script>
   </body>
 </html>

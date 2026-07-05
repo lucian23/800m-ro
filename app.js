@@ -60,6 +60,9 @@ const saSplit200 = document.querySelector("#saSplit200");
 const saSplit400 = document.querySelector("#saSplit400");
 const saSplit600 = document.querySelector("#saSplit600");
 const saSplit800 = document.querySelector("#saSplit800");
+const taperForm = document.querySelector("#taperForm");
+const taperWeeks = document.querySelector("#taperWeeks");
+const taperLevel = document.querySelector("#taperLevel");
 const personalStrategy = document.querySelector("#personalStrategy");
 const pacingScenarioForm = document.querySelector("#pacingScenarioForm");
 const pacingScenarioType = document.querySelector("#pacingScenarioType");
@@ -86,6 +89,7 @@ const copyTimeConverter = document.querySelector("#copyTimeConverter");
 const copyPaceTable = document.querySelector("#copyPaceTable");
 const copyWeightImpact = document.querySelector("#copyWeightImpact");
 const copySplitAnalyzer = document.querySelector("#copySplitAnalyzer");
+const copyTaper = document.querySelector("#copyTaper");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const goalStatus = document.querySelector("#goalStatus");
@@ -104,6 +108,7 @@ const converterStatus = document.querySelector("#converterStatus");
 const paceTableStatus = document.querySelector("#paceTableStatus");
 const weightImpactStatus = document.querySelector("#weightImpactStatus");
 const splitAnalyzerStatus = document.querySelector("#splitAnalyzerStatus");
+const taperStatus = document.querySelector("#taperStatus");
 let stateSyncEnabled = window.location.search.length > 0;
 
 const fields = {
@@ -191,6 +196,11 @@ const fields = {
   saSeg600Note: document.querySelector("#saSeg600Note"),
   saSeg800: document.querySelector("#saSeg800"),
   saSeg800Note: document.querySelector("#saSeg800Note"),
+  tpWeek2: document.querySelector("#tpWeek2"),
+  tpWeek2Text: document.querySelector("#tpWeek2Text"),
+  tpWeek1: document.querySelector("#tpWeek1"),
+  tpWeek1Text: document.querySelector("#tpWeek1Text"),
+  tpAdvice: document.querySelector("#tpAdvice"),
   scenarioFirstLap: document.querySelector("#scenarioFirstLap"),
   scenarioSecondLap: document.querySelector("#scenarioSecondLap"),
   scenarioBalance: document.querySelector("#scenarioBalance"),
@@ -1378,6 +1388,65 @@ function timeConverterSummary() {
   ].join("\n");
 }
 
+function updateTaper() {
+  const weeks = clampNumber(taperWeeks, 1, 4, 2);
+  const level = taperLevel.value;
+
+  const plans = {
+    4: {
+      junior:  { w4:"Volum ~95%, calitate normala", w4t:"Antrenament normal, cu un test controlat la mijlocul saptamanii.", w3:"Volum ~85%, calitate mentinuta", w3t:"Reduci volumul usor; pastrezi ritmul specific si forta.", w2:"Volum ~70%, ultima calitate", w2t:"Ultima sedinta serioasa (ex: 3 x 300 m). Dupa aceasta, doar activare.", w1:"Volum ~50%, prospetime", w1t:"Luni-marti: activare. Miercuri: 2 x 200 m ritm cursa. Joi-vineri: odihna sau 15-20 min foarte usor." },
+      club:    { w4:"Volum ~90%, calitate normala", w4t:"Sedintele grele la inceputul saptamanii; testeaza 600 m controlat.", w3:"Volum ~80%, pastrezi intensitatea", w3t:"Aceeasi calitate, mai putin volum usor intre sedinte.", w2:"Volum ~65%, ultima specifica", w2t:"3 x 300 m sau 2 x 400 m la ritm, apoi doar activare si mobilitate.", w1:"Volum ~45%, doar ritm", w1t:"Luni: activare. Miercuri: 2-3 x 200 m ritm. Restul: odihna activa si somn." },
+      advanced:{ w4:"Volum ~85%, calitate normala", w4t:"Inca o saptamana de lucru; reduci volumul usor, nu intensitatea.", w3:"Volum ~70%, specific redus", w3t:"3 x 300 m ritm controlat; renunti la sedintele foarte lungi.", w2:"Volum ~55%, ultima specifica", w2t:"2 x 400 m sau 500 m controlat; dupa aceasta, zero efort intens.", w1:"Volum ~40%, activare fina", w1t:"Luni: 20 min usor + 2 linii. Miercuri: 2 x 200 m relaxat la ritm. Restul: odihna." }
+    },
+    3: {
+      junior:  { w3:"Volum ~88%, calitate normala", w3t:"Antrenament obisnuit, fara teste maximale.", w2:"Volum ~72%, calitate redusa", w2t:"O singura sedinta de ritm specific; restul usor.", w1:"Volum ~52%, prospetime", w1t:"Miercuri: 2x200 m ritm. Restul: odihna activa." },
+      club:    { w3:"Volum ~82%, pastrezi calitatea", w3t:"Sedintele normale, dar fara volum mare de anduranta.", w2:"Volum ~62%, ultima specifica", w2t:"3 x 300 m sau 2 x 400 m la ritm, apoi doar activare.", w1:"Volum ~45%, doar ritm", w1t:"Luni: activare. Miercuri: 2-3 x 200 m ritm. Restul: odihna activa." },
+      advanced:{ w3:"Volum ~75%, specific redus", w3t:"3 x 300 m ritm controlat; renunti la volumul lung.", w2:"Volum ~55%, ultima specifica", w2t:"2 x 400 m controlat; dupa aceasta, zero intens.", w1:"Volum ~40%, activare fina", w1t:"Luni: 20 min usor. Miercuri: 2 x 200 m ritm. Restul: odihna." }
+    },
+    2: {
+      junior:  { w2:"Volum ~72%, calitate redusa", w2t:"O sedinta de ritm; restul usor si mobilitate.", w1:"Volum ~52%, prospetime", w1t:"Miercuri: 2x200 m ritm. Restul: odihna activa." },
+      club:    { w2:"Volum ~60%, ultima specifica", w2t:"3 x 200 m ritm cursa + 2 linii la inceputul saptamanii.", w1:"Volum ~45%, doar ritm", w1t:"Luni: activare. Miercuri: 2-3 x 200 m ritm. Restul: odihna." },
+      advanced:{ w2:"Volum ~50%, ultima atingere", w2t:"2 x 300 m ritm cursa la inceputul saptamanii, apoi liniste.", w1:"Volum ~38%, finete", w1t:"Luni: 20 min usor. Miercuri: 2 x 200 m la ritm. Restul: odihna totala." }
+    },
+    1: {
+      junior:  { w1:"Volum ~50%, doar prospetime", w1t:"Miercuri: 2x200 m ritm. Restul: mers si mobilitate." },
+      club:    { w1:"Volum ~45%, doar ritm", w1t:"Luni: activare. Miercuri: 2-3 x 200 m ritm. Restul: odihna." },
+      advanced:{ w1:"Volum ~38%, finete", w1t:"Luni: 20 min usor. Miercuri: 2 x 200 m la ritm. Restul: odihna totala." }
+    }
+  };
+
+  const plan = plans[weeks]?.[level] || plans[2]?.club;
+
+  if (weeks >= 4) {
+    fields.tpWeek2.textContent = plan.w4 || plan.w3;
+    fields.tpWeek2Text.textContent = plan.w4t || plan.w3t;
+  } else if (weeks >= 3) {
+    fields.tpWeek2.textContent = plan.w3;
+    fields.tpWeek2Text.textContent = plan.w3t;
+  } else {
+    fields.tpWeek2.textContent = plan.w2;
+    fields.tpWeek2Text.textContent = plan.w2t;
+  }
+  fields.tpWeek1.textContent = plan.w1;
+  fields.tpWeek1Text.textContent = plan.w1t;
+  fields.tpAdvice.textContent = weeks <= 1
+    ? "O saptamana nu este un taper complet, dar reducerea volumului si somnul pot face diferenta intre o cursa buna si una obosita."
+    : "Mai bine putin subantrenat decat putin supraantrenat la start. Somnul si increderea conteaza la fel de mult ca zecimile de secunda.";
+
+  syncUrlState();
+}
+
+function taperSummary() {
+  return [
+    "Plan taper 800 m",
+    `Saptamani pana la concurs: ${taperWeeks.value}`,
+    `Nivel: ${taperLevel.selectedOptions[0].textContent}`,
+    `Penultima saptamana: ${fields.tpWeek2.textContent} — ${fields.tpWeek2Text.textContent}`,
+    `Saptamana concursului: ${fields.tpWeek1.textContent} — ${fields.tpWeek1Text.textContent}`,
+    `Regula: ${fields.tpAdvice.textContent}`
+  ].join("\n");
+}
+
 function updateWeightImpact() {
   const cw = clampNumber(currentWeight, 35, 130, 70);
   const tw = clampNumber(targetWeight, 35, 130, 68);
@@ -1703,6 +1772,8 @@ weightImpactForm.addEventListener("input", enableUrlSync(updateWeightImpact));
 weightImpactForm.addEventListener("change", enableUrlSync(updateWeightImpact));
 splitAnalyzerForm.addEventListener("input", enableUrlSync(updateSplitAnalyzer));
 splitAnalyzerForm.addEventListener("change", enableUrlSync(updateSplitAnalyzer));
+taperForm.addEventListener("input", enableUrlSync(updateTaper));
+taperForm.addEventListener("change", enableUrlSync(updateTaper));
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -1745,6 +1816,7 @@ copyTimeConverter.addEventListener("click", () => copyText(timeConverterSummary(
 copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceTableStatus, "Tabelul de ritmuri a fost copiat."));
 copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
 copySplitAnalyzer.addEventListener("click", () => copyText(splitAnalyzerSummary(), splitAnalyzerStatus, "Analiza spliturilor a fost copiata."));
+copyTaper.addEventListener("click", () => copyText(taperSummary(), taperStatus, "Planul de taper a fost copiat."));
 raceChecklist.addEventListener("change", (event) => {
   if (!event.target.matches("input[type='checkbox']")) return;
   const state = readChecklistState();
@@ -1773,6 +1845,7 @@ updateTimelineDay();
 updateTimeConverter();
 updateWeightImpact();
 updateSplitAnalyzer();
+updateTaper();
 updatePacingScenario();
 renderChecklist();
 updateTestEstimate();

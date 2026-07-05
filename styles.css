@@ -798,7 +798,8 @@ input[aria-invalid="true"] {
 .timeline-day-grid,
 .time-converter-grid,
 .weight-impact-grid,
-.split-analyzer-grid {
+.split-analyzer-grid,
+.taper-grid {
   grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
   gap: 24px;
   align-items: stretch;
@@ -832,6 +833,7 @@ input[aria-invalid="true"] {
 .time-converter-results,
 .weight-impact-results,
 .split-analyzer-results,
+.taper-results,
 .goal-ladder-results,
 .pacing-scenario-results,
 .load-monitor-results,
@@ -851,6 +853,7 @@ input[aria-invalid="true"] {
 .time-converter-results article,
 .weight-impact-results article,
 .split-analyzer-results article,
+.taper-results article,
 .goal-ladder-results article,
 .pacing-scenario-results article,
 .load-monitor-results article,
@@ -869,6 +872,7 @@ input[aria-invalid="true"] {
 .time-converter-results strong,
 .weight-impact-results strong,
 .split-analyzer-results strong,
+.taper-results strong,
 .goal-ladder-results strong,
 .pacing-scenario-results strong,
 .load-monitor-results strong,
@@ -894,6 +898,7 @@ input[aria-invalid="true"] {
 .time-converter-results p,
 .weight-impact-results p,
 .split-analyzer-results p,
+.taper-results p,
 .goal-ladder-results p,
 .pacing-scenario-results p,
 .load-monitor-results p,
@@ -911,7 +916,8 @@ input[aria-invalid="true"] {
 .timeline-day-results .timeline-day-advice,
 .time-converter-results .converter-note,
 .weight-impact-results .weight-impact-advice,
-.split-analyzer-results .split-analyzer-advice {
+.split-analyzer-results .split-analyzer-advice,
+.taper-results .taper-advice {
   grid-column: 1 / -1;
 }
 
@@ -1168,6 +1174,7 @@ input[aria-invalid="true"] {
   .time-converter-results,
   .weight-impact-results,
   .split-analyzer-results,
+  .taper-results,
   .goal-ladder-results,
   .pacing-scenario-results,
   .load-monitor-results,

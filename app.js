@@ -1676,6 +1676,18 @@ function updateLoadMonitor() {
   fields.qualityShare.textContent = `${qualityPercent.toFixed(0)}%`;
   fields.loadRisk.textContent = risk;
   fields.loadAdvice.textContent = loadAdviceFor(total, qualityPercent, hard, strength, sleep);
+
+  // Update visual load bar
+  const barEasy = document.querySelector("#loadBarEasy");
+  const barQuality = document.querySelector("#loadBarQuality");
+  if (barEasy && barQuality && total > 0) {
+    const easyPct = 100 - qualityPercent;
+    barEasy.style.width = `${easyPct}%`;
+    barQuality.style.width = `${qualityPercent}%`;
+    document.querySelector("#loadBarEasyLabel").textContent = `usor ${easyPct.toFixed(0)}%`;
+    document.querySelector("#loadBarQualityLabel").textContent = `calitate ${qualityPercent.toFixed(0)}%`;
+  }
+
   syncUrlState();
 }
 

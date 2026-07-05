@@ -1083,6 +1083,51 @@ input[aria-invalid="true"] {
   background: rgba(0,0,0,0.015);
 }
 
+.load-balance {
+  grid-column: 1 / -1;
+  padding: 18px 22px;
+}
+
+.load-bar {
+  display: flex;
+  height: 18px;
+  border-radius: 9px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  background: var(--line);
+}
+
+.load-bar-easy {
+  height: 100%;
+  background: linear-gradient(90deg, #0f7c75, #15a89e);
+  border-radius: 9px 0 0 9px;
+  transition: width .3s ease;
+}
+
+.load-bar-quality {
+  height: 100%;
+  background: linear-gradient(90deg, #e8903a, #f0a855);
+  border-radius: 0 9px 9px 0;
+  transition: width .3s ease;
+}
+
+.load-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.load-bar-labels span:first-child {
+  color: #0f7c75;
+}
+
+.load-bar-labels span:last-child {
+  color: #c0782c;
+}
+
 @media (max-width: 720px) {
   .pace-table {
     font-size: 13px;

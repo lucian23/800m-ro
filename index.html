@@ -332,6 +332,16 @@
             <article><span>Calitate</span><strong id="qualityShare">20%</strong></article>
             <article><span>Scor risc</span><strong id="loadRisk">moderat</strong></article>
             <article class="load-advice"><span>Recomandare</span><p id="loadAdvice">Saptamana este echilibrata daca zilele grele sunt separate de revenire.</p></article>
+            <div class="load-balance" aria-label="Distributia incarcarii saptamanale">
+              <div class="load-bar">
+                <div class="load-bar-easy" id="loadBarEasy" style="width:80%"></div>
+                <div class="load-bar-quality" id="loadBarQuality" style="width:20%"></div>
+              </div>
+              <div class="load-bar-labels">
+                <span id="loadBarEasyLabel">usor 80%</span>
+                <span id="loadBarQualityLabel">calitate 20%</span>
+              </div>
+            </div>
 
           </div>
         </div>
@@ -795,6 +805,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-05">5 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=taper-20260705"></script>
+    <script src="app.js?v=load-bar-20260705"></script>
   </body>
 </html>

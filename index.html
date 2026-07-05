@@ -552,6 +552,35 @@
             <article class="recovery-advice"><span>Atentie</span><p id="recoveryAdvice">Nu transforma revenirea in al doilea concurs.</p></article>
           </div>
         </div>
+
+        <div class="section-subheading">
+          <h3>Selector pentru urmatoarea sedinta</h3>
+          <p>Alege prioritatea imediata dupa analiza. Instrumentul propune o sedinta potrivita cu starea de recuperare si cu numarul de zile pana la urmatorul concurs.</p>
+        </div>
+        <div class="next-session-grid">
+          <form class="planner-form" id="nextSessionForm">
+            <label>
+              Prioritate
+              <select id="nextSessionPriority">
+                <option value="pacing">Control de ritm</option>
+                <option value="speed">Viteza relaxata</option>
+                <option value="endurance">Rezistenta specifica</option>
+                <option value="recovery">Recuperare / reset</option>
+              </select>
+            </label>
+            <label>
+              Zile dupa cursa
+              <input id="daysAfterRace" type="number" min="1" max="14" value="4">
+            </label>
+            <button class="button secondary" id="copyNextSession" type="button">Copiaza sedinta</button>
+            <p class="status-message" id="nextSessionStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="next-session-results" aria-live="polite">
+            <article><span>Sedinta propusa</span><strong id="nextSessionTitle">Ritm controlat</strong><p id="nextSessionDetails">4 x 200 m la ritm de cursa cu pauza completa.</p></article>
+            <article><span>Volum tinta</span><strong id="nextSessionVolume">mediu</strong><p id="nextSessionVolumeText">Suficient pentru ritm, fara acumulare inutila.</p></article>
+            <article class="next-session-advice"><span>Regula de siguranta</span><p id="nextSessionAdvice">Opreste sedinta daca tehnica scade sau picioarele raman grele la incalzire.</p></article>
+          </div>
+        </div>
       </section>
 
       <section id="repere" class="section standards">
@@ -588,6 +617,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-04">4 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=recovery-plan-20260705"></script>
+    <script src="app.js?v=next-session-20260705"></script>
   </body>
 </html>

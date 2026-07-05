@@ -787,7 +787,8 @@ input[aria-invalid="true"] {
   align-items: stretch;
 }
 
-.recovery-plan-grid {
+.recovery-plan-grid,
+.next-session-grid {
   grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
   gap: 24px;
   align-items: stretch;
@@ -816,6 +817,7 @@ input[aria-invalid="true"] {
 .test-estimate,
 .race-review-results,
 .recovery-plan-results,
+.next-session-results,
 .goal-ladder-results,
 .pacing-scenario-results,
 .load-monitor-results,
@@ -830,6 +832,7 @@ input[aria-invalid="true"] {
 .test-estimate article,
 .race-review-results article,
 .recovery-plan-results article,
+.next-session-results article,
 .goal-ladder-results article,
 .pacing-scenario-results article,
 .load-monitor-results article,
@@ -843,6 +846,7 @@ input[aria-invalid="true"] {
 .test-estimate strong,
 .race-review-results strong,
 .recovery-plan-results strong,
+.next-session-results strong,
 .goal-ladder-results strong,
 .pacing-scenario-results strong,
 .load-monitor-results strong,
@@ -855,13 +859,15 @@ input[aria-invalid="true"] {
 #lapBalance,
 #weeklyGain,
 #scenarioSecondLap,
-#scenarioBalance {
+#scenarioBalance,
+#nextSessionVolume {
   font-size: clamp(26px, 3vw, 38px);
 }
 
 .test-estimate p,
 .race-review-results p,
 .recovery-plan-results p,
+.next-session-results p,
 .goal-ladder-results p,
 .pacing-scenario-results p,
 .load-monitor-results p,
@@ -874,7 +880,8 @@ input[aria-invalid="true"] {
 .pacing-scenario-results .scenario-segments,
 .load-monitor-results .load-advice,
 .fuel-plan-results .fuel-advice,
-.recovery-plan-results .recovery-advice {
+.recovery-plan-results .recovery-advice,
+.next-session-results .next-session-advice {
   grid-column: 1 / -1;
 }
 
@@ -1034,6 +1041,7 @@ input[aria-invalid="true"] {
   .test-estimate,
   .race-review-results,
   .recovery-plan-results,
+  .next-session-results,
   .goal-ladder-results,
   .pacing-scenario-results,
   .load-monitor-results,
@@ -1078,6 +1086,7 @@ input[aria-invalid="true"] {
   .test-estimate,
   .race-review-results,
   .recovery-plan-results,
+  .next-session-results,
   .goal-ladder-results,
   .pacing-scenario-results,
   .load-monitor-results,

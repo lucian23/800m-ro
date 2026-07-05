@@ -12,6 +12,12 @@ const goalLadderForm = document.querySelector("#goalLadderForm");
 const currentSeasonTime = document.querySelector("#currentSeasonTime");
 const goalWeeks = document.querySelector("#goalWeeks");
 const goalMilestones = document.querySelector("#goalMilestones");
+const loadMonitorForm = document.querySelector("#loadMonitorForm");
+const easyKm = document.querySelector("#easyKm");
+const qualityKm = document.querySelector("#qualityKm");
+const hardSessions = document.querySelector("#hardSessions");
+const strengthSessions = document.querySelector("#strengthSessions");
+const sleepHours = document.querySelector("#sleepHours");
 const warmupForm = document.querySelector("#warmupForm");
 const raceStartTime = document.querySelector("#raceStartTime");
 const warmupType = document.querySelector("#warmupType");
@@ -37,6 +43,7 @@ const copyPace = document.querySelector("#copyPace");
 const sharePace = document.querySelector("#sharePace");
 const copyPlan = document.querySelector("#copyPlan");
 const copyGoalLadder = document.querySelector("#copyGoalLadder");
+const copyLoadMonitor = document.querySelector("#copyLoadMonitor");
 const copyWarmup = document.querySelector("#copyWarmup");
 const copyChecklist = document.querySelector("#copyChecklist");
 const resetChecklist = document.querySelector("#resetChecklist");
@@ -48,6 +55,7 @@ const copyRaceReview = document.querySelector("#copyRaceReview");
 const paceStatus = document.querySelector("#paceStatus");
 const planStatus = document.querySelector("#planStatus");
 const goalStatus = document.querySelector("#goalStatus");
+const loadStatus = document.querySelector("#loadStatus");
 const warmupStatus = document.querySelector("#warmupStatus");
 const checklistStatus = document.querySelector("#checklistStatus");
 const sheetStatus = document.querySelector("#sheetStatus");
@@ -77,6 +85,10 @@ const fields = {
   goalGap: document.querySelector("#goalGap"),
   weeklyGain: document.querySelector("#weeklyGain"),
   goalAdvice: document.querySelector("#goalAdvice"),
+  totalKm: document.querySelector("#totalKm"),
+  qualityShare: document.querySelector("#qualityShare"),
+  loadRisk: document.querySelector("#loadRisk"),
+  loadAdvice: document.querySelector("#loadAdvice"),
   checklistProgress: document.querySelector("#checklistProgress"),
   checklistNext: document.querySelector("#checklistNext"),
   estimated800: document.querySelector("#estimated800"),
@@ -270,6 +282,11 @@ function buildSettingsUrl() {
   url.searchParams.set("sedinte", sessionsPerWeek.value);
   url.searchParams.set("actual", currentSeasonTime.value.trim());
   url.searchParams.set("sapt", goalWeeks.value);
+  url.searchParams.set("easy", easyKm.value);
+  url.searchParams.set("quality", qualityKm.value);
+  url.searchParams.set("hard", hardSessions.value);
+  url.searchParams.set("strength", strengthSessions.value);
+  url.searchParams.set("sleep", sleepHours.value);
   url.searchParams.set("start", raceStartTime.value);
   url.searchParams.set("incalzire", warmupType.value);
   url.searchParams.set("test", testType.value);
@@ -301,6 +318,11 @@ function restoreFromUrl() {
     sessionsPerWeek: params.get("sedinte"),
     currentSeasonTime: params.get("actual"),
     goalWeeks: params.get("sapt"),
+    easyKm: params.get("easy"),
+    qualityKm: params.get("quality"),
+    hardSessions: params.get("hard"),
+    strengthSessions: params.get("strength"),
+    sleepHours: params.get("sleep"),
     raceStartTime: params.get("start"),
     warmupType: params.get("incalzire"),
     testType: params.get("test"),
@@ -322,6 +344,11 @@ function restoreFromUrl() {
   if (values.sessionsPerWeek) sessionsPerWeek.value = values.sessionsPerWeek;
   if (values.currentSeasonTime) currentSeasonTime.value = values.currentSeasonTime;
   if (values.goalWeeks) goalWeeks.value = values.goalWeeks;
+  if (values.easyKm) easyKm.value = values.easyKm;
+  if (values.qualityKm) qualityKm.value = values.qualityKm;
+  if (values.hardSessions) hardSessions.value = values.hardSessions;
+  if (values.strengthSessions) strengthSessions.value = values.strengthSessions;
+  if (values.sleepHours) sleepHours.value = values.sleepHours;
   if (/^\d{2}:\d{2}$/.test(values.raceStartTime || "")) raceStartTime.value = values.raceStartTime;
   if ([...warmupType.options].some((option) => option.value === values.warmupType)) warmupType.value = values.warmupType;
   if ([...testType.options].some((option) => option.value === values.testType)) testType.value = values.testType;
@@ -657,6 +684,7 @@ function athleteSheetSummary() {
     `Nivel estimat: ${fields.performanceLevel.textContent} | ${fields.nextBenchmark.textContent}`,
     `Scara sezonului: actual ${currentSeasonTime.value}, ${goalWeeks.value} saptamani, ${fields.weeklyGain.textContent}`,
     ...milestoneText,
+    `Incarcare saptamanala: ${fields.totalKm.textContent}, calitate ${fields.qualityShare.textContent}, risc ${fields.loadRisk.textContent}`,
     `Plan saptamana: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte`,
     `Incalzire: ${warmupType.selectedOptions[0].textContent}, start ${raceStartTime.value}`,
     `Checklist: ${checkedCount}/${checklistItems.length} bifate`,
@@ -968,6 +996,63 @@ function goalLadderSummary() {
   ].join("\n");
 }
 
+function clampNumber(input, min, max, fallback) {
+  const value = Number(input.value);
+  const clamped = Number.isFinite(value) ? Math.max(min, Math.min(max, value)) : fallback;
+  input.value = clamped;
+  return clamped;
+}
+
+function loadAdviceFor(total, qualityPercent, hard, strength, sleep) {
+  if (total < 18) return "Volumul este mic: potrivit pentru revenire, incepatori sau saptamana de descarcare.";
+  if (qualityPercent > 28 || hard >= 4) return "Risc ridicat: prea multa calitate pentru 800 m. Redu o sedinta grea sau mareste revenirea.";
+  if (sleep < 6.5 && hard >= 2) return "Somnul este limita principala. Pastreaza calitatea, dar scade volumul pana revine recuperarea.";
+  if (strength === 0) return "Adauga cel putin o sedinta scurta de forta/mobilitate pentru postura si preventie.";
+  if (qualityPercent < 12 && hard <= 1) return "Saptamana este usor aerobica. Buna pentru baza, dar include linii sau ritm controlat daca esti in perioada specifica.";
+  return "Saptamana este echilibrata daca zilele grele sunt separate de revenire.";
+}
+
+function updateLoadMonitor() {
+  const easy = clampNumber(easyKm, 0, 120, 28);
+  const quality = clampNumber(qualityKm, 0, 40, 7);
+  const hard = clampNumber(hardSessions, 0, 5, 2);
+  const strength = clampNumber(strengthSessions, 0, 5, 2);
+  const sleep = clampNumber(sleepHours, 4, 10, 8);
+  const total = easy + quality;
+  const qualityPercent = total > 0 ? (quality / total) * 100 : 0;
+  let riskScore = 0;
+
+  if (qualityPercent > 18) riskScore += 1;
+  if (qualityPercent > 28) riskScore += 1;
+  if (hard >= 3) riskScore += 1;
+  if (hard >= 4) riskScore += 1;
+  if (sleep < 7) riskScore += 1;
+  if (sleep < 6) riskScore += 1;
+  if (strength === 0) riskScore += 1;
+
+  const risk = riskScore <= 1 ? "scazut" : riskScore <= 3 ? "moderat" : "ridicat";
+  fields.totalKm.textContent = `${total.toFixed(total % 1 ? 1 : 0)} km`;
+  fields.qualityShare.textContent = `${qualityPercent.toFixed(0)}%`;
+  fields.loadRisk.textContent = risk;
+  fields.loadAdvice.textContent = loadAdviceFor(total, qualityPercent, hard, strength, sleep);
+  syncUrlState();
+}
+
+function loadMonitorSummary() {
+  return [
+    "Monitor incarcare saptamanala 800 m",
+    `Km usori: ${easyKm.value}`,
+    `Km calitate: ${qualityKm.value}`,
+    `Sedinte intense: ${hardSessions.value}`,
+    `Forta/mobilitate: ${strengthSessions.value}`,
+    `Somn mediu: ${sleepHours.value} h/noapte`,
+    `Volum total: ${fields.totalKm.textContent}`,
+    `Pondere calitate: ${fields.qualityShare.textContent}`,
+    `Scor risc: ${fields.loadRisk.textContent}`,
+    `Recomandare: ${fields.loadAdvice.textContent}`
+  ].join("\n");
+}
+
 function updatePlan() {
   const level = athleteLevel.value;
   const phase = seasonPhase.value;
@@ -1025,6 +1110,8 @@ plannerForm.addEventListener("input", enableUrlSync(updatePlan));
 plannerForm.addEventListener("change", enableUrlSync(updatePlan));
 goalLadderForm.addEventListener("input", enableUrlSync(updateGoalLadder));
 goalLadderForm.addEventListener("change", enableUrlSync(updateGoalLadder));
+loadMonitorForm.addEventListener("input", enableUrlSync(updateLoadMonitor));
+loadMonitorForm.addEventListener("change", enableUrlSync(updateLoadMonitor));
 warmupForm.addEventListener("input", enableUrlSync(updateWarmup));
 warmupForm.addEventListener("change", enableUrlSync(updateWarmup));
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
@@ -1039,6 +1126,7 @@ copyPace.addEventListener("click", () => copyText(paceSummary(), paceStatus, "Re
 sharePace.addEventListener("click", () => copyText(buildSettingsUrl().toString(), paceStatus, "Linkul cu setarile a fost copiat."));
 copyPlan.addEventListener("click", () => copyText(planSummary(), planStatus, "Planul saptamanal a fost copiat."));
 copyGoalLadder.addEventListener("click", () => copyText(goalLadderSummary(), goalStatus, "Scara obiectivului a fost copiata."));
+copyLoadMonitor.addEventListener("click", () => copyText(loadMonitorSummary(), loadStatus, "Incarcarea saptamanala a fost copiata."));
 copyWarmup.addEventListener("click", () => copyText(warmupSummary(), warmupStatus, "Incalzirea a fost copiata."));
 copyChecklist.addEventListener("click", () => copyText(checklistSummary(), checklistStatus, "Checklistul a fost copiat."));
 resetChecklist.addEventListener("click", () => {
@@ -1071,6 +1159,7 @@ restoreFromUrl();
 updateCalculator();
 updatePlan();
 updateGoalLadder();
+updateLoadMonitor();
 updateWarmup();
 updatePacingScenario();
 renderChecklist();

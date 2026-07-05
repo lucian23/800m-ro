@@ -267,11 +267,13 @@ h3 {
 .test-predictor-grid,
 .race-review-grid,
 .pacing-scenario-grid,
+.load-monitor-grid,
 .goal-ladder-grid,
 .sheet-grid,
 .test-estimate,
 .race-review-results,
 .pacing-scenario-results,
+.load-monitor-results,
 .goal-ladder-results,
 .timeline,
 .workout-grid,
@@ -300,6 +302,7 @@ h3 {
 .test-estimate article,
 .race-review-results article,
 .pacing-scenario-results article,
+.load-monitor-results article,
 .goal-ladder-results article,
 .goal-milestones,
 .scenario-segments,
@@ -332,6 +335,7 @@ h3 {
 .test-estimate span,
 .race-review-results span,
 .pacing-scenario-results span,
+.load-monitor-results span,
 .goal-ladder-results span,
 .workout-meta,
 .quick-tools span {
@@ -782,7 +786,8 @@ input[aria-invalid="true"] {
   align-items: stretch;
 }
 
-.pacing-scenario-grid {
+.pacing-scenario-grid,
+.load-monitor-grid {
   grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
   gap: 24px;
   align-items: stretch;
@@ -797,7 +802,8 @@ input[aria-invalid="true"] {
 .test-estimate,
 .race-review-results,
 .goal-ladder-results,
-.pacing-scenario-results {
+.pacing-scenario-results,
+.load-monitor-results {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
@@ -808,7 +814,8 @@ input[aria-invalid="true"] {
 .test-estimate article,
 .race-review-results article,
 .goal-ladder-results article,
-.pacing-scenario-results article {
+.pacing-scenario-results article,
+.load-monitor-results article {
   display: grid;
   gap: 10px;
   align-content: start;
@@ -818,7 +825,8 @@ input[aria-invalid="true"] {
 .test-estimate strong,
 .race-review-results strong,
 .goal-ladder-results strong,
-.pacing-scenario-results strong {
+.pacing-scenario-results strong,
+.load-monitor-results strong {
   color: var(--track-dark);
   font-size: clamp(30px, 4vw, 48px);
   line-height: 1;
@@ -834,13 +842,15 @@ input[aria-invalid="true"] {
 .test-estimate p,
 .race-review-results p,
 .goal-ladder-results p,
-.pacing-scenario-results p {
+.pacing-scenario-results p,
+.load-monitor-results p {
   margin-bottom: 0;
   color: var(--muted);
 }
 
 .pacing-scenario-results .scenario-advice,
-.pacing-scenario-results .scenario-segments {
+.pacing-scenario-results .scenario-segments,
+.load-monitor-results .load-advice {
   grid-column: 1 / -1;
 }
 
@@ -978,6 +988,7 @@ input[aria-invalid="true"] {
   .test-predictor-grid,
   .race-review-grid,
   .pacing-scenario-grid,
+  .load-monitor-grid,
   .goal-ladder-grid,
   .sheet-grid,
   .results {
@@ -998,6 +1009,7 @@ input[aria-invalid="true"] {
   .race-review-results,
   .goal-ladder-results,
   .pacing-scenario-results,
+  .load-monitor-results,
   .workout-grid,
   .cards-three,
   .knowledge-grid {
@@ -1039,6 +1051,7 @@ input[aria-invalid="true"] {
   .race-review-results,
   .goal-ladder-results,
   .pacing-scenario-results,
+  .load-monitor-results,
   .workout-grid,
   .cards-three,
   .knowledge-grid,

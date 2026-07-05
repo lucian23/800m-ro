@@ -243,6 +243,43 @@
             <div class="goal-milestones" id="goalMilestones"></div>
           </div>
         </div>
+
+        <div class="section-subheading">
+          <h3>Monitor de incarcare saptamanala</h3>
+          <p>Estimeaza rapid daca saptamana este echilibrata pentru un alergator de 800 m: volum usor, kilometri de calitate, sedinte intense, forta si somn.</p>
+        </div>
+        <div class="load-monitor-grid">
+          <form class="planner-form" id="loadMonitorForm">
+            <label>
+              Km usori / revenire
+              <input id="easyKm" type="number" min="0" max="120" step="0.5" value="28">
+            </label>
+            <label>
+              Km calitate / ritm / tempo
+              <input id="qualityKm" type="number" min="0" max="40" step="0.5" value="7">
+            </label>
+            <label>
+              Sedinte intense
+              <input id="hardSessions" type="number" min="0" max="5" value="2">
+            </label>
+            <label>
+              Sedinte forta / mobilitate
+              <input id="strengthSessions" type="number" min="0" max="5" value="2">
+            </label>
+            <label>
+              Somn mediu / noapte
+              <input id="sleepHours" type="number" min="4" max="10" step="0.25" value="8">
+            </label>
+            <button class="button secondary" id="copyLoadMonitor" type="button">Copiaza incarcarea</button>
+            <p class="status-message" id="loadStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="load-monitor-results" aria-live="polite">
+            <article><span>Volum total</span><strong id="totalKm">35 km</strong></article>
+            <article><span>Calitate</span><strong id="qualityShare">20%</strong></article>
+            <article><span>Scor risc</span><strong id="loadRisk">moderat</strong></article>
+            <article class="load-advice"><span>Recomandare</span><p id="loadAdvice">Saptamana este echilibrata daca zilele grele sunt separate de revenire.</p></article>
+          </div>
+        </div>
       </section>
 
       <section id="incalzire" class="section warmup-section">
@@ -486,6 +523,6 @@
       <p>Ultima actualizare: <time datetime="2026-07-04">4 iulie 2026</time></p>
     </footer>
 
-    <script src="app.js?v=pacing-scenario-20260704"></script>
+    <script src="app.js?v=load-monitor-20260704"></script>
   </body>
 </html>

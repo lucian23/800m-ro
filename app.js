@@ -60,6 +60,14 @@ const saSplit200 = document.querySelector("#saSplit200");
 const saSplit400 = document.querySelector("#saSplit400");
 const saSplit600 = document.querySelector("#saSplit600");
 const saSplit800 = document.querySelector("#saSplit800");
+const enduranceProfileForm = document.querySelector("#enduranceProfileForm");
+const best400 = document.querySelector("#best400");
+const best800 = document.querySelector("#best800");
+const enduranceIndex = document.querySelector("#enduranceIndex");
+const enduranceProfile = document.querySelector("#enduranceProfile");
+const enduranceAdvice = document.querySelector("#enduranceAdvice");
+const copyEnduranceProfile = document.querySelector("#copyEnduranceProfile");
+const enduranceStatus = document.querySelector("#enduranceStatus");
 const taperForm = document.querySelector("#taperForm");
 const taperWeeks = document.querySelector("#taperWeeks");
 const taperLevel = document.querySelector("#taperLevel");
@@ -703,6 +711,40 @@ function planSummary() {
     `Plan 800 m: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte/saptamana`,
     ...rows
   ].join("\n");
+}
+
+function updateEnduranceProfile() {
+  const t400 = parseTime(best400.value);
+  const t800 = parseTime(best800.value);
+
+  if (!t400 || !t800 || t400 <= 0 || t800 <= t400 || t400 > 90 || t800 > 240) {
+    enduranceIndex.textContent = "—";
+    enduranceProfile.textContent = "—";
+    enduranceAdvice.textContent = "Introdu timpi validi: 400 m sub 90s, 800 m peste 400 m.";
+    return;
+  }
+
+  /* EI = (800m - 2×400m) / 400m × 100 */
+  const ei = Math.round(((t800 - 2 * t400) / t400) * 100 * 10) / 10;
+  enduranceIndex.textContent = `${ei}%`;
+
+  let profile, advice;
+  if (ei < 18) {
+    profile = "Viteza — ai nevoie de rezistenta specifica";
+    advice = "Profil tipic de sprinter sau semifondist foarte rapid. Prioritatea ta: intervale de 300-500 m la ritm specific, tempo runs si cresterea volumului aerob usor. Evita sa fortezi viteza — ai deja.";
+  } else if (ei <= 24) {
+    profile = "Echilibrat — semifondist complet";
+    advice = "Profil echilibrat, potrivit pentru 800 m. Mentine mixul actual: 40% viteza/ritm, 40% rezistenta specifica, 20% aerobic. Lucreaza la consistenta intre tururi si la executia tacticii.";
+  } else if (ei <= 30) {
+    profile = "Rezistenta — ai nevoie de viteza";
+    advice = "Profil orientat spre anduranta. Prioritatea ta: accelerari, 150-200 m rapid, drill-uri de frecventa si forta elastica. Antrenamentele de volum deja le stapanesti — acum adauga calitate neuromusculara.";
+  } else {
+    profile = "Anduranta pura — diferenta mare intre 400 si 800";
+    advice = "Diferenta foarte mare intre cele doua probe. Concentreaza-te pe viteza pura si tehnica de alergare: sprinturi scurte (60-100 m), forta specifica, mobilitate de sold si frecventa pasilor. Volumul aerobic e deja acoperit.";
+  }
+
+  enduranceProfile.textContent = profile;
+  enduranceAdvice.textContent = advice;
 }
 
 function updateCalculator() {
@@ -1500,6 +1542,16 @@ function updateTaper() {
   syncUrlState();
 }
 
+function enduranceProfileSummary() {
+  return [
+    `Cel mai bun 400 m: ${best400.value}`,
+    `Cel mai bun 800 m: ${best800.value}`,
+    `Indice de anduranta: ${enduranceIndex.textContent}`,
+    `Profil: ${enduranceProfile.textContent}`,
+    `Recomandare: ${enduranceAdvice.textContent}`,
+  ].join("\n");
+}
+
 function taperSummary() {
   return [
     "Plan taper 800 m",
@@ -1850,6 +1902,8 @@ splitAnalyzerForm.addEventListener("input", enableUrlSync(updateSplitAnalyzer));
 splitAnalyzerForm.addEventListener("change", enableUrlSync(updateSplitAnalyzer));
 taperForm.addEventListener("input", enableUrlSync(updateTaper));
 taperForm.addEventListener("change", enableUrlSync(updateTaper));
+enduranceProfileForm.addEventListener("input", updateEnduranceProfile);
+enduranceProfileForm.addEventListener("change", updateEnduranceProfile);
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -1892,6 +1946,7 @@ copyTimeConverter.addEventListener("click", () => copyText(timeConverterSummary(
 copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceTableStatus, "Tabelul de ritmuri a fost copiat."));
 copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
 copySplitAnalyzer.addEventListener("click", () => copyText(splitAnalyzerSummary(), splitAnalyzerStatus, "Analiza spliturilor a fost copiata."));
+copyEnduranceProfile.addEventListener("click", () => copyText(enduranceProfileSummary(), enduranceStatus, "Profilul de anduranta a fost copiat."));
 copyTaper.addEventListener("click", () => copyText(taperSummary(), taperStatus, "Planul de taper a fost copiat."));
 raceChecklist.addEventListener("change", (event) => {
   if (!event.target.matches("input[type='checkbox']")) return;
@@ -1976,3 +2031,4 @@ window.addEventListener("scroll", () => {
 });
 
 updateActiveNav();
+updateEnduranceProfile();

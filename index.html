@@ -775,6 +775,31 @@
           </div>
         </div>
         </div>
+
+        <div class="section-subheading">
+          <h3>Profil de anduranta</h3>
+          <p>Introdu cel mai bun timp la 400 m si la 800 m. Indicele de anduranta (EI) iti spune daca profilul tau e orientat spre viteza sau spre rezistenta — si ce tip de antrenament te ajuta cel mai mult.</p>
+        </div>
+        <div class="endurance-grid">
+          <form class="planner-form" id="enduranceProfileForm">
+            <label>
+              Cel mai bun 400 m
+              <input id="best400" type="text" inputmode="decimal" value="52.0" aria-describedby="enduranceHelp">
+            </label>
+            <label>
+              Cel mai bun 800 m
+              <input id="best800" type="text" inputmode="decimal" value="1:58.0">
+            </label>
+            <p id="enduranceHelp" class="hint">Formate acceptate: 52.0, 1:58.0, 118.0.</p>
+            <button class="button secondary" id="copyEnduranceProfile" type="button">Copiaza profilul</button>
+            <p class="status-message" id="enduranceStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="endurance-results" aria-live="polite">
+            <article><span>Indice de anduranta</span><strong id="enduranceIndex">—</strong></article>
+            <article><span>Profil</span><strong id="enduranceProfile">—</strong></article>
+            <article class="endurance-advice"><span>Recomandare</span><p id="enduranceAdvice">Introdu timpii pentru o analiza personalizata.</p></article>
+          </div>
+        </div>
       </section>
 
       <section id="repere" class="section standards">

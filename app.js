@@ -60,6 +60,15 @@ const saSplit200 = document.querySelector("#saSplit200");
 const saSplit400 = document.querySelector("#saSplit400");
 const saSplit600 = document.querySelector("#saSplit600");
 const saSplit800 = document.querySelector("#saSplit800");
+const hydrationForm = document.querySelector("#hydrationForm");
+const hydWeight = document.querySelector("#hydWeight");
+const hydTemp = document.querySelector("#hydTemp");
+const hydBefore = document.querySelector("#hydBefore");
+const hydWarmup = document.querySelector("#hydWarmup");
+const hydAfter = document.querySelector("#hydAfter");
+const hydElectrolytes = document.querySelector("#hydElectrolytes");
+const copyHydration = document.querySelector("#copyHydration");
+const hydrationStatus = document.querySelector("#hydrationStatus");
 const progressForm = document.querySelector("#progressForm");
 const oldPB = document.querySelector("#oldPB");
 const newPB = document.querySelector("#newPB");
@@ -731,6 +740,36 @@ function planSummary() {
     `Plan 800 m: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte/saptamana`,
     ...rows
   ].join("\n");
+}
+
+function updateHydration() {
+  const kg = parseFloat(hydWeight.value);
+  const temp = parseFloat(hydTemp.value);
+
+  if (!kg || kg < 40 || !temp || temp < 5) {
+    hydBefore.textContent = "—";
+    hydWarmup.textContent = "—";
+    hydAfter.textContent = "—";
+    return;
+  }
+
+  /* 5-7 ml per kg body weight 2-3 hours before */
+  const before = Math.round(kg * 6);
+  hydBefore.textContent = `${before} ml (inghitituri mici)`;
+
+  /* 150-250 ml during warmup depending on temp */
+  const warmup = temp > 28 ? 200 : temp > 20 ? 150 : 120;
+  hydWarmup.textContent = `${warmup} ml (maxim)`;
+
+  /* Post-race: 150% of sweat loss, ~4 ml/kg for short race */
+  const after = Math.round(kg * 5 * (1 + (temp > 25 ? 0.2 : 0)));
+  hydAfter.textContent = `${after} ml (in prima ora)`;
+
+  if (temp >= 25) {
+    hydElectrolytes.textContent = `La ${temp}°C si ${kg} kg: recomand electroliti dupa cursa (pastila sau bautura sports). Completeaza si cu un snack sarat.`;
+  } else {
+    hydElectrolytes.textContent = `La ${temp}°C, apa simpla e suficienta pentru o cursa de 800 m. Daca transpiri mult, poti adauga electroliti optional.`;
+  }
 }
 
 function updateProgress() {
@@ -1656,6 +1695,16 @@ function updateTaper() {
   syncUrlState();
 }
 
+function hydrationSummary() {
+  return [
+    `Greutate: ${hydWeight.value} kg | Temperatura: ${hydTemp.value}°C`,
+    `Cu 2-3 ore inainte: ${hydBefore.textContent}`,
+    `In timpul incalzirii: ${hydWarmup.textContent}`,
+    `Dupa cursa: ${hydAfter.textContent}`,
+    `Electroliti: ${hydElectrolytes.textContent}`,
+  ].join("\n");
+}
+
 function progressSummary() {
   return [
     `Vechiul PB: ${oldPB.value}`,
@@ -2044,6 +2093,8 @@ closeSimForm.addEventListener("input", updateCloseSim);
 closeSimForm.addEventListener("change", updateCloseSim);
 progressForm.addEventListener("input", updateProgress);
 progressForm.addEventListener("change", updateProgress);
+hydrationForm.addEventListener("input", updateHydration);
+hydrationForm.addEventListener("change", updateHydration);
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -2087,6 +2138,7 @@ copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceT
 copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
 copySplitAnalyzer.addEventListener("click", () => copyText(splitAnalyzerSummary(), splitAnalyzerStatus, "Analiza spliturilor a fost copiata."));
 copyCloseSim.addEventListener("click", () => copyText(closeSimSummary(), closeSimStatus, "Simularea a fost copiata."));
+copyHydration.addEventListener("click", () => copyText(hydrationSummary(), hydrationStatus, "Recomandarile de hidratare au fost copiate."));
 copyProgress.addEventListener("click", () => copyText(progressSummary(), progressStatus, "Analiza progresului a fost copiata."));
 copyEnduranceProfile.addEventListener("click", () => copyText(enduranceProfileSummary(), enduranceStatus, "Profilul de anduranta a fost copiat."));
 copyTaper.addEventListener("click", () => copyText(taperSummary(), taperStatus, "Planul de taper a fost copiat."));
@@ -2176,3 +2228,4 @@ updateActiveNav();
 updateEnduranceProfile();
 updateCloseSim();
 updateProgress();
+updateHydration();

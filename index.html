@@ -474,6 +474,32 @@
             <article><span>Sosire la pista</span><strong id="tlArrival">13:15</strong><p id="tlArrivalText">Ridicare numar, recunoastere pista, verificare camera de apel.</p></article>
             <article class="timeline-day-advice"><span>Start</span><strong id="tlStart">18:30</strong><p id="tlStartText">Incalzirea incepe cu 55 min inainte. Ultimele guri de apa cu 10-15 min inainte.</p></article>
           </div>
+        </div>
+
+        <div class="section-subheading">
+          <h3>Hidratare si electroliti</h3>
+          <p>In functie de greutate si temperatura, afla cat ai nevoie sa bei inainte, in timpul incalzirii si dupa cursa de 800 m.</p>
+        </div>
+        <div class="hydration-grid">
+          <form class="planner-form" id="hydrationForm">
+            <label>
+              Greutatea ta (kg)
+              <input id="hydWeight" type="number" min="40" max="120" value="65" aria-describedby="hydHelp">
+            </label>
+            <label>
+              Temperatura la concurs (°C)
+              <input id="hydTemp" type="number" min="5" max="40" value="24">
+            </label>
+            <p id="hydHelp" class="hint">800 m e o proba scurta — hidratarea se face inainte, nu in timpul cursei.</p>
+            <button class="button secondary" id="copyHydration" type="button">Copiaza recomandarile</button>
+            <p class="status-message" id="hydrationStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="hydration-results" aria-live="polite">
+            <article><span>Cu 2-3 ore inainte</span><strong id="hydBefore"></strong><p>Bea treptat, nu dintr-o data.</p></article>
+            <article><span>In timpul incalzirii</span><strong id="hydWarmup"></strong><p>Inghitituri mici, apa simpla.</p></article>
+            <article><span>Dupa cursa</span><strong id="hydAfter"></strong><p>Rehidrateaza treptat in prima ora.</p></article>
+            <article class="hydration-advice"><span>Electroliti</span><p id="hydElectrolytes">La temperaturi peste 25°C sau daca transpiri mult, adauga o bautura cu electroliti dupa cursa.</p></article>
+          </div>
         </div>      </section>
 
       <section id="checklist" class="section checklist-section">

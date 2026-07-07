@@ -500,7 +500,35 @@
             <article><span>Dupa cursa</span><strong id="hydAfter"></strong><p>Rehidrateaza treptat in prima ora.</p></article>
             <article class="hydration-advice"><span>Electroliti</span><p id="hydElectrolytes">La temperaturi peste 25°C sau daca transpiri mult, adauga o bautura cu electroliti dupa cursa.</p></article>
           </div>
-        </div>      </section>
+        </div>
+
+        <div class="section-subheading">
+          <h3>Zone de efort dupa puls</h3>
+          <p>Pe baza pulsului maxim, estimeaza 5 zone de efort pentru antrenamente bazate pe ritm cardiac.</p>
+        </div>
+        <div class="zones-grid">
+          <form class="planner-form" id="hrZonesForm">
+            <label>
+              Puls maxim (bpm)
+              <input id="hrMax" type="number" min="140" max="220" value="195" aria-describedby="hrHelp">
+            </label>
+            <label>
+              Puls de repaus (bpm)
+              <input id="hrRest" type="number" min="30" max="80" value="54">
+            </label>
+            <p id="hrHelp" class="hint">Estimeaza pulsul maxim: 220 - varsta. Pulsul de repaus se masoara dimineata.</p>
+            <button class="button secondary" id="copyHrZones" type="button">Copiaza zonele</button>
+            <p class="status-message" id="hrZonesStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="zones-results" aria-live="polite" id="hrZonesResults">
+            <article><span>Zona 1 — Recuperare</span><strong id="z1Range">—</strong><p>Incalzire, revenire. Conversatie fluenta.</p></article>
+            <article><span>Zona 2 — Aerob</span><strong id="z2Range">—</strong><p>Rezistenta. Propozitii scurte.</p></article>
+            <article><span>Zona 3 — Tempo</span><strong id="z3Range">—</strong><p>Ritm sustinut. Prag aerob.</p></article>
+            <article><span>Zona 4 — Prag</span><strong id="z4Range">—</strong><p>Intervale 800 m. Respiratie sacadata.</p></article>
+            <article><span>Zona 5 — VO2max</span><strong id="z5Range">—</strong><p>Sprinturi. Efort maxim.</p></article>
+          </div>
+        </div>
+      </section>
 
       <section id="checklist" class="section checklist-section">
         <div class="section-heading">

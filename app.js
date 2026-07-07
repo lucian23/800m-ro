@@ -60,6 +60,7 @@ const saSplit200 = document.querySelector("#saSplit200");
 const saSplit400 = document.querySelector("#saSplit400");
 const saSplit600 = document.querySelector("#saSplit600");
 const saSplit800 = document.querySelector("#saSplit800");
+const hrZonesForm = document.querySelector("#hrZonesForm");
 const caloriesForm = document.querySelector("#caloriesForm");
 const calWeight = document.querySelector("#calWeight");
 const cal800 = document.querySelector("#cal800");
@@ -863,6 +864,18 @@ function updateWorkoutPredictor() {
   const fatigue = reps > 8 ? "mare" : reps > 5 ? "medie" : "mica";
   const repNote = dist === 200 ? `${reps}x200m` : dist === 150 ? `${reps}x150m` : `${reps}x300m`;
   wpAdvice.textContent = `Pe baza a ${repNote} cu media de ${avgTime.toFixed(1)}s si oboseala ${fatigue}, timpul estimat de cursa este ${formatTime(predicted800, 1)}. Predictia presupune conditii normale si executie corecta a antrenamentului.`;
+}
+
+function updateHrZones() {
+  const max = parseInt(hrMax.value, 10) || 195;
+  const rest = parseInt(hrRest.value, 10) || 54;
+  const reserve = max - rest;
+
+  document.getElementById("z1Range").textContent = `${rest + Math.round(reserve * 0.60)} — ${rest + Math.round(reserve * 0.70)} bpm`;
+  document.getElementById("z2Range").textContent = `${rest + Math.round(reserve * 0.70)} — ${rest + Math.round(reserve * 0.80)} bpm`;
+  document.getElementById("z3Range").textContent = `${rest + Math.round(reserve * 0.80)} — ${rest + Math.round(reserve * 0.88)} bpm`;
+  document.getElementById("z4Range").textContent = `${rest + Math.round(reserve * 0.88)} — ${rest + Math.round(reserve * 0.93)} bpm`;
+  document.getElementById("z5Range").textContent = `${rest + Math.round(reserve * 0.93)} — ${max} bpm`;
 }
 
 function updateHydration() {
@@ -1818,6 +1831,21 @@ function updateTaper() {
   syncUrlState();
 }
 
+function hrZonesSummary() {
+  return [
+    "Zone Efort — Puls cardiac",
+    `Puls maxim: ${hrMax?.value} bpm | Repaus: ${hrRest?.value} bpm`,
+    "",
+    `Z1 (Recuperare): ${document.getElementById("z1Range").textContent}`,
+    `Z2 (Aerob): ${document.getElementById("z2Range").textContent}`,
+    `Z3 (Tempo): ${document.getElementById("z3Range").textContent}`,
+    `Z4 (Prag): ${document.getElementById("z4Range").textContent}`,
+    `Z5 (VO2max): ${document.getElementById("z5Range").textContent}`,
+    "",
+    "Calculat pe baza pulsului maxim si de repaus (formula Karvonen)."
+  ].join("\n");
+}
+
 function caloriesSummary() {
   return [
     `Greutate: ${calWeight.value} kg | Timp 800 m: ${targetTime.value}`,
@@ -2293,7 +2321,8 @@ copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceT
 copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
 copySplitAnalyzer.addEventListener("click", () => copyText(splitAnalyzerSummary(), splitAnalyzerStatus, "Analiza spliturilor a fost copiata."));
 copyCloseSim.addEventListener("click", () => copyText(closeSimSummary(), closeSimStatus, "Simularea a fost copiata."));
-copyCalories.addEventListener("click", () => copyText(caloriesSummary(), caloriesStatus, "Estimarea de calorii a fost copiata."));
+copyHrZones.addEventListener("click", () => copyText(hrZonesSummary(), hrZonesStatus));
+  copyCalories.addEventListener("click", () => copyText(caloriesSummary(), caloriesStatus, "Estimarea de calorii a fost copiata."));
 copyRest.addEventListener("click", () => copyText(restSummary(), restStatus, "Recomandarea de pauze a fost copiata."));
 copyWorkoutPredictor.addEventListener("click", () => copyText(workoutPredictorSummary(), workoutPredictorStatus, "Predictia a fost copiata."));
 copyHydration.addEventListener("click", () => copyText(hydrationSummary(), hydrationStatus, "Recomandarile de hidratare au fost copiate."));
@@ -2389,4 +2418,5 @@ updateProgress();
 updateHydration();
 updateWorkoutPredictor();
 updateRest();
-updateCalories();
+updateHrZones();
+  updateCalories();

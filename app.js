@@ -60,6 +60,17 @@ const saSplit200 = document.querySelector("#saSplit200");
 const saSplit400 = document.querySelector("#saSplit400");
 const saSplit600 = document.querySelector("#saSplit600");
 const saSplit800 = document.querySelector("#saSplit800");
+const progressForm = document.querySelector("#progressForm");
+const oldPB = document.querySelector("#oldPB");
+const newPB = document.querySelector("#newPB");
+const progressTotal = document.querySelector("#progressTotal");
+const progressSpeed = document.querySelector("#progressSpeed");
+const progressSpeedNote = document.querySelector("#progressSpeedNote");
+const progressEndurance = document.querySelector("#progressEndurance");
+const progressEnduranceNote = document.querySelector("#progressEnduranceNote");
+const progressAdvice = document.querySelector("#progressAdvice");
+const copyProgress = document.querySelector("#copyProgress");
+const progressStatus = document.querySelector("#progressStatus");
 const closeSimForm = document.querySelector("#closeSimForm");
 const closeSplit600 = document.querySelector("#closeSplit600");
 const closeSeconds = document.querySelector("#closeSeconds");
@@ -720,6 +731,67 @@ function planSummary() {
     `Plan 800 m: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte/saptamana`,
     ...rows
   ].join("\n");
+}
+
+function updateProgress() {
+  const oldT = parseTime(oldPB.value);
+  const newT = parseTime(newPB.value);
+
+  if (!oldT || !newT || oldT <= 60 || newT <= 60 || oldT > 240 || newT > 240) {
+    progressTotal.textContent = "—";
+    progressSpeed.textContent = "—";
+    progressEndurance.textContent = "—";
+    progressSpeedNote.textContent = "";
+    progressEnduranceNote.textContent = "";
+    progressAdvice.textContent = "Introdu doua rezultate valide (ex: 2:05.0 si 1:58.0).";
+    return;
+  }
+
+  if (oldT <= newT) {
+    progressTotal.textContent = "Nicio imbunatatire";
+    progressSpeed.textContent = "—";
+    progressEndurance.textContent = "—";
+    progressSpeedNote.textContent = "";
+    progressEnduranceNote.textContent = "";
+    progressAdvice.textContent = "Noul timp nu e mai bun decat vechiul PB. Verifica datele introduse.";
+    return;
+  }
+
+  const improvement = oldT - newT;
+  const pct = ((improvement / oldT) * 100).toFixed(1);
+  progressTotal.textContent = `-${formatTime(improvement, 1)} (${pct}%)`;
+
+  /* Analyze where the improvement came from: */
+  /* Speed component: first 400m (0-200 + 200-400) */
+  /* Endurance component: second 400m (400-600 + 600-800) */
+  const oldPace = oldT / 4;
+  const newPace = newT / 4;
+  const speedGain = (oldPace - newPace) * 2;
+  const enduranceGain = improvement - speedGain;
+
+  if (speedGain > 0) {
+    progressSpeed.textContent = `-${speedGain.toFixed(1)}s`;
+    progressSpeedNote.textContent = "Viteza — primul tur mai rapid.";
+  } else {
+    progressSpeed.textContent = "—";
+    progressSpeedNote.textContent = "Fara castig pe viteza.";
+  }
+
+  if (enduranceGain > 0) {
+    progressEndurance.textContent = `-${enduranceGain.toFixed(1)}s`;
+    progressEnduranceNote.textContent = "Anduranta — turul doi mai sustinut.";
+  } else {
+    progressEndurance.textContent = "—";
+    progressEnduranceNote.textContent = "Fara castig pe anduranta.";
+  }
+
+  if (speedGain > enduranceGain * 1.3) {
+    progressAdvice.textContent = `Ai castigat ${improvement.toFixed(1)}s, mai ales prin viteza (primul tur). Continua sa lucrezi anduranta specifica — 500 m repetari, tempo runs — pentru un al doilea tur mai puternic.`;
+  } else if (enduranceGain > speedGain * 1.3) {
+    progressAdvice.textContent = `Ai castigat ${improvement.toFixed(1)}s, mai ales prin anduranta (turul doi). Adauga acum viteza: 150 m accelerari, drill-uri de frecventa, forta elastica.`;
+  } else {
+    progressAdvice.textContent = `Ai castigat ${improvement.toFixed(1)}s echilibrat, pe ambele tururi. Dezvoltarea e armonioasa — mentine mixul actual de antrenament.`;
+  }
 }
 
 function updateCloseSim() {
@@ -1584,6 +1656,17 @@ function updateTaper() {
   syncUrlState();
 }
 
+function progressSummary() {
+  return [
+    `Vechiul PB: ${oldPB.value}`,
+    `Noul PB: ${newPB.value}`,
+    `Progres: ${progressTotal.textContent}`,
+    `Viteza: ${progressSpeed.textContent} ${progressSpeedNote.textContent}`,
+    `Anduranta: ${progressEndurance.textContent} ${progressEnduranceNote.textContent}`,
+    `Concluzie: ${progressAdvice.textContent}`,
+  ].join("\n");
+}
+
 function closeSimSummary() {
   return [
     `Split 600 m: ${closeSplit600.value}`,
@@ -1959,6 +2042,8 @@ enduranceProfileForm.addEventListener("input", updateEnduranceProfile);
 enduranceProfileForm.addEventListener("change", updateEnduranceProfile);
 closeSimForm.addEventListener("input", updateCloseSim);
 closeSimForm.addEventListener("change", updateCloseSim);
+progressForm.addEventListener("input", updateProgress);
+progressForm.addEventListener("change", updateProgress);
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -2002,6 +2087,7 @@ copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceT
 copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
 copySplitAnalyzer.addEventListener("click", () => copyText(splitAnalyzerSummary(), splitAnalyzerStatus, "Analiza spliturilor a fost copiata."));
 copyCloseSim.addEventListener("click", () => copyText(closeSimSummary(), closeSimStatus, "Simularea a fost copiata."));
+copyProgress.addEventListener("click", () => copyText(progressSummary(), progressStatus, "Analiza progresului a fost copiata."));
 copyEnduranceProfile.addEventListener("click", () => copyText(enduranceProfileSummary(), enduranceStatus, "Profilul de anduranta a fost copiat."));
 copyTaper.addEventListener("click", () => copyText(taperSummary(), taperStatus, "Planul de taper a fost copiat."));
 raceChecklist.addEventListener("change", (event) => {
@@ -2089,3 +2175,4 @@ window.addEventListener("scroll", () => {
 updateActiveNav();
 updateEnduranceProfile();
 updateCloseSim();
+updateProgress();

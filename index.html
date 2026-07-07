@@ -822,6 +822,32 @@
             <article class="endurance-advice"><span>Recomandare</span><p id="enduranceAdvice">Introdu timpii pentru o analiza personalizata.</p></article>
           </div>
         </div>
+
+        <div class="section-subheading">
+          <h3>Analiza progresului</h3>
+          <p>Introdu doua rezultate la 800 m din momente diferite (de exemplu, sezonul trecut si sezonul curent). Instrumentul iti arata exact unde ai castigat timp — viteza, anduranta sau ambele.</p>
+        </div>
+        <div class="progress-grid">
+          <form class="planner-form" id="progressForm">
+            <label>
+              Vechiul PB 800 m
+              <input id="oldPB" type="text" inputmode="decimal" value="2:05.0" aria-describedby="progressHelp">
+            </label>
+            <label>
+              Noul PB 800 m
+              <input id="newPB" type="text" inputmode="decimal" value="1:58.0">
+            </label>
+            <p id="progressHelp" class="hint">Formate acceptate: 1:58.0, 118.0, 2:05.</p>
+            <button class="button secondary" id="copyProgress" type="button">Copiaza analiza</button>
+            <p class="status-message" id="progressStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="progress-results" aria-live="polite">
+            <article><span>Progres total</span><strong id="progressTotal">—</strong></article>
+            <article><span>Castig pe viteza</span><strong id="progressSpeed">—</strong><p id="progressSpeedNote"></p></article>
+            <article><span>Castig pe anduranta</span><strong id="progressEndurance">—</strong><p id="progressEnduranceNote"></p></article>
+            <article class="progress-advice"><span>Concluzie</span><p id="progressAdvice">Introdu ambele rezultate pentru o analiza detaliata.</p></article>
+          </div>
+        </div>
       </section>
 
       <section id="repere" class="section standards">

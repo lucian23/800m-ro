@@ -857,6 +857,28 @@
         </div>
 
         <div class="section-subheading">
+          <h3>Consum caloric la 800 m</h3>
+          <p>Estimeaza caloriile arse intr-o cursa de 800 m si in antrenamentele asociate, in functie de greutatea ta si de timpul de cursa.</p>
+        </div>
+        <div class="calories-grid">
+          <form class="planner-form" id="caloriesForm">
+            <label>
+              Greutatea ta (kg)
+              <input id="calWeight" type="number" min="40" max="120" value="65" aria-describedby="calHelp">
+            </label>
+            <p id="calHelp" class="hint">Foloseste greutatea ta actuala. Timpul de cursa e preluat din calculatorul principal.</p>
+            <button class="button secondary" id="copyCalories" type="button">Copiaza estimarea</button>
+            <p class="status-message" id="caloriesStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="calories-results" aria-live="polite">
+            <article><span>Cursa de 800 m</span><strong id="cal800">—</strong><p>~2 min la intensitate maxima</p></article>
+            <article><span>Antrenament specific (45 min)</span><strong id="calSpecific">—</strong><p>Intervale + pauze</p></article>
+            <article><span>Alergare usoara (30 min)</span><strong id="calEasy">—</strong><p>Recuperare activa</p></article>
+            <article class="calories-advice"><span>Context</span><p id="calAdvice">Caloriile sunt estimari orientative bazate pe greutate si intensitate.</p></article>
+          </div>
+        </div>
+
+        <div class="section-subheading">
           <h3>Analizor de splituri reale</h3>
           <p>Introdu spliturile tale reale de la 200 m, 400 m, 600 m si 800 m dintr-o cursa. Instrumentul le compara cu spliturile ideale din calculator si evidentiaza diferentele pe fiecare segment.</p>
         </div>

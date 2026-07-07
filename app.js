@@ -60,6 +60,14 @@ const saSplit200 = document.querySelector("#saSplit200");
 const saSplit400 = document.querySelector("#saSplit400");
 const saSplit600 = document.querySelector("#saSplit600");
 const saSplit800 = document.querySelector("#saSplit800");
+const caloriesForm = document.querySelector("#caloriesForm");
+const calWeight = document.querySelector("#calWeight");
+const cal800 = document.querySelector("#cal800");
+const calSpecific = document.querySelector("#calSpecific");
+const calEasy = document.querySelector("#calEasy");
+const calAdvice = document.querySelector("#calAdvice");
+const copyCalories = document.querySelector("#copyCalories");
+const caloriesStatus = document.querySelector("#caloriesStatus");
 const restForm = document.querySelector("#restForm");
 const restDist = document.querySelector("#restDist");
 const restType = document.querySelector("#restType");
@@ -757,6 +765,33 @@ function planSummary() {
     `Plan 800 m: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte/saptamana`,
     ...rows
   ].join("\n");
+}
+
+function updateCalories() {
+  const kg = parseFloat(calWeight.value);
+  const total = parseTime(targetTime.value);
+
+  if (!kg || kg < 40 || !total) {
+    cal800.textContent = "—";
+    calSpecific.textContent = "—";
+    calEasy.textContent = "—";
+    return;
+  }
+
+  /* 800m race: ~0.2 kcal/kg/min at max intensity × 2 min */
+  const raceMin = total / 60;
+  const raceCal = Math.round(kg * 0.22 * raceMin);
+  cal800.textContent = `~${raceCal} kcal`;
+
+  /* Specific workout 45min: mixed intensity ~0.15 kcal/kg/min */
+  const specCal = Math.round(kg * 0.15 * 45);
+  calSpecific.textContent = `~${specCal} kcal`;
+
+  /* Easy run 30min: ~0.12 kcal/kg/min */
+  const easyCal = Math.round(kg * 0.12 * 30);
+  calEasy.textContent = `~${easyCal} kcal`;
+
+  calAdvice.textContent = `Pentru ${kg} kg si ${formatTime(total)} la 800 m: cursa arde ~${raceCal} kcal. Un antrenament specific arde ~${specCal} kcal, iar o alergare usoara ~${easyCal} kcal. Estimari MET — variatii individuale de ±15%.`;
 }
 
 function updateRest() {
@@ -1783,6 +1818,16 @@ function updateTaper() {
   syncUrlState();
 }
 
+function caloriesSummary() {
+  return [
+    `Greutate: ${calWeight.value} kg | Timp 800 m: ${targetTime.value}`,
+    `Cursa 800 m: ${cal800.textContent}`,
+    `Antrenament 45 min: ${calSpecific.textContent}`,
+    `Alergare usoara 30 min: ${calEasy.textContent}`,
+    `Context: ${calAdvice.textContent}`,
+  ].join("\n");
+}
+
 function restSummary() {
   return [
     `${restDist.value}m, efort ${restType.value}`,
@@ -2248,6 +2293,7 @@ copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceT
 copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
 copySplitAnalyzer.addEventListener("click", () => copyText(splitAnalyzerSummary(), splitAnalyzerStatus, "Analiza spliturilor a fost copiata."));
 copyCloseSim.addEventListener("click", () => copyText(closeSimSummary(), closeSimStatus, "Simularea a fost copiata."));
+copyCalories.addEventListener("click", () => copyText(caloriesSummary(), caloriesStatus, "Estimarea de calorii a fost copiata."));
 copyRest.addEventListener("click", () => copyText(restSummary(), restStatus, "Recomandarea de pauze a fost copiata."));
 copyWorkoutPredictor.addEventListener("click", () => copyText(workoutPredictorSummary(), workoutPredictorStatus, "Predictia a fost copiata."));
 copyHydration.addEventListener("click", () => copyText(hydrationSummary(), hydrationStatus, "Recomandarile de hidratare au fost copiate."));
@@ -2343,3 +2389,4 @@ updateProgress();
 updateHydration();
 updateWorkoutPredictor();
 updateRest();
+updateCalories();

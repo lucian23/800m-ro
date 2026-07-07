@@ -711,6 +711,41 @@
         </div>
 
         <div class="section-subheading">
+          <h3>Pauze recomandate intre repetari</h3>
+          <p>Alege distanta de repetare si tipul de efort. Calculatorul iti spune cat de lunga sa fie pauza — in minute sau in metri de jogging usor.</p>
+        </div>
+        <div class="rest-grid">
+          <form class="planner-form" id="restForm">
+            <label>
+              Distanta repetare
+              <select id="restDist">
+                <option value="150">150 m</option>
+                <option value="200" selected>200 m</option>
+                <option value="300">300 m</option>
+                <option value="400">400 m</option>
+                <option value="500">500 m</option>
+              </select>
+            </label>
+            <label>
+              Tip efort
+              <select id="restType">
+                <option value="speed">Viteza (95-100%)</option>
+                <option value="specific" selected>Specific 800 m (90-95%)</option>
+                <option value="endurance">Rezistenta (80-90%)</option>
+                <option value="aerobic">Aerob (70-80%)</option>
+              </select>
+            </label>
+            <button class="button secondary" id="copyRest" type="button">Copiaza recomandarea</button>
+            <p class="status-message" id="restStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="rest-results" aria-live="polite">
+            <article><span>Durata pauza</span><strong id="restDuration">—</strong></article>
+            <article><span>Echivalent jogging</span><strong id="restJog">—</strong></article>
+            <article class="rest-advice"><span>Recomandare</span><p id="restAdvice">Alege distanta si tipul de efort pentru pauze recomandate.</p></article>
+          </div>
+        </div>
+
+        <div class="section-subheading">
           <h3>Analiza dupa cursa</h3>
           <p>Compara timpul tinta cu rezultatul real si cu splitul de la 400 m. Instrumentul arata abaterea, balansul dintre tururi si o concluzie practica pentru urmatoarea saptamana.</p>
         </div>

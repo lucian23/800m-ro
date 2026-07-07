@@ -60,6 +60,14 @@ const saSplit200 = document.querySelector("#saSplit200");
 const saSplit400 = document.querySelector("#saSplit400");
 const saSplit600 = document.querySelector("#saSplit600");
 const saSplit800 = document.querySelector("#saSplit800");
+const restForm = document.querySelector("#restForm");
+const restDist = document.querySelector("#restDist");
+const restType = document.querySelector("#restType");
+const restDuration = document.querySelector("#restDuration");
+const restJog = document.querySelector("#restJog");
+const restAdvice = document.querySelector("#restAdvice");
+const copyRest = document.querySelector("#copyRest");
+const restStatus = document.querySelector("#restStatus");
 const workoutPredictorForm = document.querySelector("#workoutPredictorForm");
 const repDistance = document.querySelector("#repDistance");
 const repAvgTime = document.querySelector("#repAvgTime");
@@ -749,6 +757,42 @@ function planSummary() {
     `Plan 800 m: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte/saptamana`,
     ...rows
   ].join("\n");
+}
+
+function updateRest() {
+  const dist = parseInt(restDist.value);
+  const type = restType.value;
+
+  if (!dist || !type) {
+    restDuration.textContent = "—";
+    restJog.textContent = "—";
+    return;
+  }
+
+  /* Recovery ratios: speed needs longest rest, aerobic needs shortest */
+  const ratios = {
+    speed: { ratio: 6, jog: 4, note: "Recuperare completa. Ritmul cardiac revine sub 120. Nu scurta pauzele — calitatea e prioritara." },
+    specific: { ratio: 3, jog: 2, note: "Pauza activa: jogging usor sau mers. Ritmul cardiac scade, dar nu complet. Pastreaza consistenta intre repetari." },
+    endurance: { ratio: 1.5, jog: 1, note: "Pauza relativ scurta. Jogging lejer intre repetari. Obiectivul e sa mentii ritmul chiar si cu oboseala acumulata." },
+    aerobic: { ratio: 0.5, jog: 0.5, note: "Pauza minima. Genul de efort unde inveti sa alergi relaxat chiar si sub oboseala. Ritmul conteaza mai putin decat senzatia." },
+  };
+
+  const r = ratios[type];
+  /* Estimate rep time based on distance and effort type */
+  const repTime = dist * (type === "speed" ? 0.13 : type === "specific" ? 0.15 : type === "endurance" ? 0.17 : 0.20);
+  const restSec = Math.round(repTime * r.ratio * 10) / 10;
+  const jogMeters = Math.round(dist * r.jog);
+
+  if (restSec >= 60) {
+    const min = Math.floor(restSec / 60);
+    const sec = Math.round(restSec % 60);
+    restDuration.textContent = sec > 0 ? `${min}:${String(sec).padStart(2, "0")}` : `${min} min`;
+  } else {
+    restDuration.textContent = `${restSec.toFixed(0)} sec`;
+  }
+
+  restJog.textContent = `~${jogMeters} m jogging usor`;
+  restAdvice.textContent = r.note;
 }
 
 function updateWorkoutPredictor() {
@@ -1739,6 +1783,15 @@ function updateTaper() {
   syncUrlState();
 }
 
+function restSummary() {
+  return [
+    `${restDist.value}m, efort ${restType.value}`,
+    `Pauza: ${restDuration.textContent}`,
+    `Echivalent: ${restJog.textContent}`,
+    `Recomandare: ${restAdvice.textContent}`,
+  ].join("\n");
+}
+
 function workoutPredictorSummary() {
   return [
     `Antrenament: ${repCount.value}x${repDistance.value}m cu media ${repAvgTime.value}s`,
@@ -2150,6 +2203,8 @@ hydrationForm.addEventListener("input", updateHydration);
 hydrationForm.addEventListener("change", updateHydration);
 workoutPredictorForm.addEventListener("input", updateWorkoutPredictor);
 workoutPredictorForm.addEventListener("change", updateWorkoutPredictor);
+restForm.addEventListener("input", updateRest);
+restForm.addEventListener("change", updateRest);
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -2193,6 +2248,7 @@ copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceT
 copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
 copySplitAnalyzer.addEventListener("click", () => copyText(splitAnalyzerSummary(), splitAnalyzerStatus, "Analiza spliturilor a fost copiata."));
 copyCloseSim.addEventListener("click", () => copyText(closeSimSummary(), closeSimStatus, "Simularea a fost copiata."));
+copyRest.addEventListener("click", () => copyText(restSummary(), restStatus, "Recomandarea de pauze a fost copiata."));
 copyWorkoutPredictor.addEventListener("click", () => copyText(workoutPredictorSummary(), workoutPredictorStatus, "Predictia a fost copiata."));
 copyHydration.addEventListener("click", () => copyText(hydrationSummary(), hydrationStatus, "Recomandarile de hidratare au fost copiate."));
 copyProgress.addEventListener("click", () => copyText(progressSummary(), progressStatus, "Analiza progresului a fost copiata."));
@@ -2286,3 +2342,4 @@ updateCloseSim();
 updateProgress();
 updateHydration();
 updateWorkoutPredictor();
+updateRest();

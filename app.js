@@ -60,6 +60,15 @@ const saSplit200 = document.querySelector("#saSplit200");
 const saSplit400 = document.querySelector("#saSplit400");
 const saSplit600 = document.querySelector("#saSplit600");
 const saSplit800 = document.querySelector("#saSplit800");
+const closeSimForm = document.querySelector("#closeSimForm");
+const closeSplit600 = document.querySelector("#closeSplit600");
+const closeSeconds = document.querySelector("#closeSeconds");
+const closeLabel = document.querySelector("#closeLabel");
+const closeEasy = document.querySelector("#closeEasy");
+const closeCompetitive = document.querySelector("#closeCompetitive");
+const closeAdvice = document.querySelector("#closeAdvice");
+const copyCloseSim = document.querySelector("#copyCloseSim");
+const closeSimStatus = document.querySelector("#closeSimStatus");
 const enduranceProfileForm = document.querySelector("#enduranceProfileForm");
 const best400 = document.querySelector("#best400");
 const best800 = document.querySelector("#best800");
@@ -711,6 +720,39 @@ function planSummary() {
     `Plan 800 m: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte/saptamana`,
     ...rows
   ].join("\n");
+}
+
+function updateCloseSim() {
+  const totalTarget = parseTime(targetTime.value);
+  const split600 = parseTime(closeSplit600.value);
+
+  if (!totalTarget || !split600 || split600 >= totalTarget || split600 < 30) {
+    closeSeconds.textContent = "—";
+    closeLabel.textContent = "Introdu un timp valid la 600 m";
+    closeEasy.textContent = "—";
+    closeCompetitive.textContent = "—";
+    closeAdvice.textContent = "Timpul la 600 m trebuie sa fie mai mic decat tinta finala de 800 m.";
+    return;
+  }
+
+  const remaining = totalTarget - split600;
+  closeSeconds.textContent = remaining.toFixed(1);
+  closeLabel.textContent = `secunde pentru ultimii 200 m (tinta ${formatTime(totalTarget)})`;
+
+  /* Targets for the last 200m */
+  if (remaining <= 26) {
+    closeEasy.textContent = `${(remaining + 1.5).toFixed(1)}s — mentine forma`;
+    closeCompetitive.textContent = `${remaining.toFixed(1)}s — ritm de cursa`;
+    closeAdvice.textContent = "Esti aproape de tinta. Pastreaza postura, accelereaza bratele, nu te uita in spate. Ultimii 100 m sunt despre vointa, nu despre viteza.";
+  } else if (remaining <= 30) {
+    closeEasy.textContent = `${(remaining * 0.94).toFixed(1)}s — inchidere controlata`;
+    closeCompetitive.textContent = `${remaining.toFixed(1)}s — ritm constant`;
+    closeAdvice.textContent = "Ai un buffer confortabil. Nu sari — mentine culoarul, privirea inainte si creste progresiv presiunea. Ultimii 80 m elibereaza tot.";
+  } else {
+    closeEasy.textContent = `${(remaining * 0.92).toFixed(1)}s — inchidere lejera`;
+    closeCompetitive.textContent = `${(remaining * 0.97).toFixed(1)}s — accelerare progresiva`;
+    closeAdvice.textContent = "Ai trecut prea incet prin 600 m. Accelereaza imediat, fara panica. Fiecare secunda pierduta acum costa dublu pe ultimii 100 m.";
+  }
 }
 
 function updateEnduranceProfile() {
@@ -1542,6 +1584,17 @@ function updateTaper() {
   syncUrlState();
 }
 
+function closeSimSummary() {
+  return [
+    `Split 600 m: ${closeSplit600.value}`,
+    `Tinta 800 m: ${targetTime.value}`,
+    `Timp ramas: ${closeSeconds.textContent}s`,
+    `Tinta usoara: ${closeEasy.textContent}`,
+    `Tinta competitiva: ${closeCompetitive.textContent}`,
+    `Strategie: ${closeAdvice.textContent}`,
+  ].join("\n");
+}
+
 function enduranceProfileSummary() {
   return [
     `Cel mai bun 400 m: ${best400.value}`,
@@ -1904,6 +1957,8 @@ taperForm.addEventListener("input", enableUrlSync(updateTaper));
 taperForm.addEventListener("change", enableUrlSync(updateTaper));
 enduranceProfileForm.addEventListener("input", updateEnduranceProfile);
 enduranceProfileForm.addEventListener("change", updateEnduranceProfile);
+closeSimForm.addEventListener("input", updateCloseSim);
+closeSimForm.addEventListener("change", updateCloseSim);
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -1946,6 +2001,7 @@ copyTimeConverter.addEventListener("click", () => copyText(timeConverterSummary(
 copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceTableStatus, "Tabelul de ritmuri a fost copiat."));
 copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
 copySplitAnalyzer.addEventListener("click", () => copyText(splitAnalyzerSummary(), splitAnalyzerStatus, "Analiza spliturilor a fost copiata."));
+copyCloseSim.addEventListener("click", () => copyText(closeSimSummary(), closeSimStatus, "Simularea a fost copiata."));
 copyEnduranceProfile.addEventListener("click", () => copyText(enduranceProfileSummary(), enduranceStatus, "Profilul de anduranta a fost copiat."));
 copyTaper.addEventListener("click", () => copyText(taperSummary(), taperStatus, "Planul de taper a fost copiat."));
 raceChecklist.addEventListener("change", (event) => {
@@ -2032,3 +2088,4 @@ window.addEventListener("scroll", () => {
 
 updateActiveNav();
 updateEnduranceProfile();
+updateCloseSim();

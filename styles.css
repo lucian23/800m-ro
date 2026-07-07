@@ -845,6 +845,47 @@ input[aria-invalid="true"] {
   gap: 1.5rem;
   align-items: start;
 }
+.close-sim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+.close-sim-grid .planner-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.close-sim-results {
+  display: grid;
+  gap: 1rem;
+}
+.close-sim-results article {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.close-sim-results strong {
+  font-size: 1.2rem;
+  color: var(--accent);
+}
+.close-sim-results span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.close-sim-results p {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+.close-sim-advice {
+  grid-column: 1 / -1;
+}
 .endurance-grid .planner-form {
   display: flex;
   flex-direction: column;
@@ -889,9 +930,12 @@ input[aria-invalid="true"] {
   .endurance-grid {
     grid-template-columns: 1fr;
   }
+  .close-sim-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.split-analyzer-grid {
+.split-analyzer-grid,
 .taper-grid {
   grid-template-columns: minmax(280px, 390px) minmax(0, 1fr);
   gap: 24px;

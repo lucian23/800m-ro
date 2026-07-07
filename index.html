@@ -569,6 +569,28 @@
           <article><span>400-600</span><h3>Zona cheie</h3><p>Oboseala creste, dar postura decide. Brate active, privire sus, cadenta stabila si rabdare tactica.</p></article>
           <article><span>600-800</span><h3>Finish pregatit</h3><p>Alege culoarul devreme, creste presiunea progresiv si nu astepta ultimii 60 m pentru prima schimbare.</p></article>
         </div>
+
+        <div class="section-subheading">
+          <h3>Simulator ultimii 200 m</h3>
+          <p>Esti la 600 m si vezi timpul pe tabela. Introdu splitul real la 600 m si afla ce ritm iti trebuie pe ultimii 200 m pentru a atinge diverse tinte.</p>
+        </div>
+        <div class="close-sim-grid">
+          <form class="planner-form" id="closeSimForm">
+            <label>
+              Split real la 600 m
+              <input id="closeSplit600" type="text" inputmode="decimal" value="1:28.0" aria-describedby="closeHelp">
+            </label>
+            <p id="closeHelp" class="hint">Introdu timpul real pe care l-ai vazut la 600 m. Formate acceptate: 1:28.0, 88.0.</p>
+            <button class="button secondary" id="copyCloseSim" type="button">Copiaza simularea</button>
+            <p class="status-message" id="closeSimStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="close-sim-results" aria-live="polite">
+            <article><span>Ai la dispozitie</span><strong id="closeSeconds">—</strong><p id="closeLabel">secunde pentru ultimii 200 m</p></article>
+            <article><span>Tinta usoara</span><strong id="closeEasy">—</strong></article>
+            <article><span>Tinta competitiva</span><strong id="closeCompetitive">—</strong></article>
+            <article class="close-sim-advice"><span>Strategie</span><p id="closeAdvice">Introdu timpul de la 600 m pentru o simulare.</p></article>
+          </div>
+        </div>
       </section>
 
       <section id="antrenamente" class="section workouts">

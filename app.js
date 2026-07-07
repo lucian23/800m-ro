@@ -129,6 +129,8 @@ const fields = {
   zoneEndurance: document.querySelector("#zoneEndurance"),
   zoneTempo: document.querySelector("#zoneTempo"),
   zoneEasy: document.querySelector("#zoneEasy"),
+  bpmSingle: document.querySelector("#bpmSingle"),
+  bpmLabel: document.querySelector("#bpmLabel"),
   goalGap: document.querySelector("#goalGap"),
   weeklyGain: document.querySelector("#weeklyGain"),
   goalAdvice: document.querySelector("#goalAdvice"),
@@ -742,6 +744,14 @@ function updateCalculator() {
 
   renderStrategy(cumulative, raceProfile.value);
   renderPaceTable(total);
+
+  /* Metronom BPM — estimare pasi pe 200 m si cadenta */
+  const pacePer200 = total / 4;
+  const stepsPer200 = 100; /* aproximare rezonabila pentru alergator de 800 m */
+  const cadence = Math.round((stepsPer200 / pacePer200) * 60);
+  const bpmHalf = Math.round(cadence / 2);
+  fields.bpmSingle.textContent = `${cadence} / ${bpmHalf} BPM`;
+  fields.bpmLabel.textContent = `1:1 (pas/click) / 2:1 (2 pasi/click) la ritm de ${pacePer200.toFixed(1)}s/200m`;
 
   syncUrlState();
 }

@@ -678,6 +678,39 @@
         </div>
 
         <div class="section-subheading">
+          <h3>Predictie din antrenament</h3>
+          <p>Introdu timpul mediu al repetarilor dintr-un antrenament de ritm si numarul de repetari. Predictorul estimeaza ce timp de 800 m poti alerga in cursa.</p>
+        </div>
+        <div class="workout-predictor-grid">
+          <form class="planner-form" id="workoutPredictorForm">
+            <label>
+              Tip repetare
+              <select id="repDistance">
+                <option value="200" selected>200 m</option>
+                <option value="150">150 m</option>
+                <option value="300">300 m</option>
+              </select>
+            </label>
+            <label>
+              Timp mediu per repetare
+              <input id="repAvgTime" type="text" inputmode="decimal" value="29.5" aria-describedby="wpHelp">
+            </label>
+            <label>
+              Numar de repetari
+              <input id="repCount" type="number" min="2" max="12" value="5">
+            </label>
+            <p id="wpHelp" class="hint">Format timp: 29.5, 1:30.0. Introdu media repetarilor (nu cel mai bun timp).</p>
+            <button class="button secondary" id="copyWorkoutPredictor" type="button">Copiaza predictia</button>
+            <p class="status-message" id="workoutPredictorStatus" role="status" aria-live="polite"></p>
+          </form>
+          <div class="workout-predictor-results" aria-live="polite">
+            <article><span>Estimare 800 m</span><strong id="wpEstimate">—</strong></article>
+            <article><span>Ritm per 200 m</span><strong id="wpPace">—</strong></article>
+            <article class="workout-predictor-advice"><span>Validare</span><p id="wpAdvice">Introdu datele antrenamentului pentru o predictie.</p></article>
+          </div>
+        </div>
+
+        <div class="section-subheading">
           <h3>Analiza dupa cursa</h3>
           <p>Compara timpul tinta cu rezultatul real si cu splitul de la 400 m. Instrumentul arata abaterea, balansul dintre tururi si o concluzie practica pentru urmatoarea saptamana.</p>
         </div>

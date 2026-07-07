@@ -60,6 +60,15 @@ const saSplit200 = document.querySelector("#saSplit200");
 const saSplit400 = document.querySelector("#saSplit400");
 const saSplit600 = document.querySelector("#saSplit600");
 const saSplit800 = document.querySelector("#saSplit800");
+const workoutPredictorForm = document.querySelector("#workoutPredictorForm");
+const repDistance = document.querySelector("#repDistance");
+const repAvgTime = document.querySelector("#repAvgTime");
+const repCount = document.querySelector("#repCount");
+const wpEstimate = document.querySelector("#wpEstimate");
+const wpPace = document.querySelector("#wpPace");
+const wpAdvice = document.querySelector("#wpAdvice");
+const copyWorkoutPredictor = document.querySelector("#copyWorkoutPredictor");
+const workoutPredictorStatus = document.querySelector("#workoutPredictorStatus");
 const hydrationForm = document.querySelector("#hydrationForm");
 const hydWeight = document.querySelector("#hydWeight");
 const hydTemp = document.querySelector("#hydTemp");
@@ -740,6 +749,41 @@ function planSummary() {
     `Plan 800 m: ${athleteLevel.selectedOptions[0].textContent}, ${seasonPhase.selectedOptions[0].textContent}, ${sessionsPerWeek.value} sedinte/saptamana`,
     ...rows
   ].join("\n");
+}
+
+function updateWorkoutPredictor() {
+  const dist = parseInt(repDistance.value);
+  const avgTime = parseTime(repAvgTime.value);
+  const reps = parseInt(repCount.value);
+
+  if (!dist || !avgTime || !reps || avgTime < 10 || reps < 2) {
+    wpEstimate.textContent = "—";
+    wpPace.textContent = "—";
+    wpAdvice.textContent = "Introdu date valide: timpul mediu per repetare si numarul de repetari.";
+    return;
+  }
+
+  /* Estimate 800m from workout: */
+  /* For 200m reps: race_200 = avg + 0.3-0.8s (more reps = more fatigue) */
+  /* For 150m reps: scale to 200m then convert */
+  /* For 300m reps: race_200 = (avg/1.5) + 0.5-1.0s */
+  let pace200;
+  if (dist === 150) {
+    pace200 = (avgTime / 150) * 200 * 1.02 + (reps > 6 ? 0.7 : 0.4);
+  } else if (dist === 300) {
+    pace200 = (avgTime / 300) * 200 + (reps > 4 ? 0.8 : 0.5);
+  } else {
+    pace200 = avgTime + 0.3 + reps * 0.08;
+  }
+
+  const predicted800 = pace200 * 4;
+  wpEstimate.textContent = formatTime(predicted800, 1);
+  wpPace.textContent = `${pace200.toFixed(1)}s`;
+
+  /* Advice based on reps fatigue factor */
+  const fatigue = reps > 8 ? "mare" : reps > 5 ? "medie" : "mica";
+  const repNote = dist === 200 ? `${reps}x200m` : dist === 150 ? `${reps}x150m` : `${reps}x300m`;
+  wpAdvice.textContent = `Pe baza a ${repNote} cu media de ${avgTime.toFixed(1)}s si oboseala ${fatigue}, timpul estimat de cursa este ${formatTime(predicted800, 1)}. Predictia presupune conditii normale si executie corecta a antrenamentului.`;
 }
 
 function updateHydration() {
@@ -1695,6 +1739,15 @@ function updateTaper() {
   syncUrlState();
 }
 
+function workoutPredictorSummary() {
+  return [
+    `Antrenament: ${repCount.value}x${repDistance.value}m cu media ${repAvgTime.value}s`,
+    `Predictie 800 m: ${wpEstimate.textContent}`,
+    `Ritm per 200 m: ${wpPace.textContent}`,
+    `Validare: ${wpAdvice.textContent}`,
+  ].join("\n");
+}
+
 function hydrationSummary() {
   return [
     `Greutate: ${hydWeight.value} kg | Temperatura: ${hydTemp.value}°C`,
@@ -2095,6 +2148,8 @@ progressForm.addEventListener("input", updateProgress);
 progressForm.addEventListener("change", updateProgress);
 hydrationForm.addEventListener("input", updateHydration);
 hydrationForm.addEventListener("change", updateHydration);
+workoutPredictorForm.addEventListener("input", updateWorkoutPredictor);
+workoutPredictorForm.addEventListener("change", updateWorkoutPredictor);
 testPredictorForm.addEventListener("input", enableUrlSync(updateTestEstimate));
 testPredictorForm.addEventListener("change", enableUrlSync(updateTestEstimate));
 raceReviewForm.addEventListener("input", enableUrlSync(updateRaceReview));
@@ -2138,6 +2193,7 @@ copyPaceTable.addEventListener("click", () => copyText(paceTableSummary(), paceT
 copyWeightImpact.addEventListener("click", () => copyText(weightImpactSummary(), weightImpactStatus, "Estimarea a fost copiata."));
 copySplitAnalyzer.addEventListener("click", () => copyText(splitAnalyzerSummary(), splitAnalyzerStatus, "Analiza spliturilor a fost copiata."));
 copyCloseSim.addEventListener("click", () => copyText(closeSimSummary(), closeSimStatus, "Simularea a fost copiata."));
+copyWorkoutPredictor.addEventListener("click", () => copyText(workoutPredictorSummary(), workoutPredictorStatus, "Predictia a fost copiata."));
 copyHydration.addEventListener("click", () => copyText(hydrationSummary(), hydrationStatus, "Recomandarile de hidratare au fost copiate."));
 copyProgress.addEventListener("click", () => copyText(progressSummary(), progressStatus, "Analiza progresului a fost copiata."));
 copyEnduranceProfile.addEventListener("click", () => copyText(enduranceProfileSummary(), enduranceStatus, "Profilul de anduranta a fost copiat."));
@@ -2229,3 +2285,4 @@ updateEnduranceProfile();
 updateCloseSim();
 updateProgress();
 updateHydration();
+updateWorkoutPredictor();
